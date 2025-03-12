@@ -7,18 +7,18 @@ A web application for seamless transactions.
 
 1. **Clone the repo**  
    ```sh
-   git clone https://github.com/yourusername/paymatter.git
+   git clone https://github.com/venkatesh2100/paymatter.git
    cd paymatter
    ```
 
 2. **Install dependencies**  
    ```sh
-   npm install
+   npm install turbo || npm i
    ```
 
 3. **Run the app**  
    ```sh
-   npm run dev
+   turbo run dev
    ```
 
 ## ⚡ Features  
@@ -29,7 +29,7 @@ A web application for seamless transactions.
 ## 🛠 Tech Stack  
 - **Frontend:** React, Tailwind CSS  
 - **Backend:** Node.js, Express, Psql   
-- **Auth:** JWT  
+- **Auth:** JWT , NextAuth 
 
 ## TODO:
 - [ ] Add Recoil and NextAuth.
