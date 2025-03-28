@@ -1,8 +1,8 @@
-"use client"
+"use client";
 // import { useEffect, useState } from "react"
-import Navbar from "../components/navbar"
-export * from "@prisma/client"
-
+import Navbar from "../components/navbar";
+export * from "@prisma/client";
+import HomePage from "../components/Homepage";
 export default function Home() {
   /* useState & useEffect code.
   const [count ,setcount] = useState(0);
@@ -21,11 +21,10 @@ export default function Home() {
     return true
   }*/
 
-  return(
+  return (
     <div>
-      <Navbar/>
-      <div className="pt-20 text-4xl">Home Page</div>
-      {/* <div>{count}</div> */}
+      <Navbar />
+      <HomePage />
     </div>
-  )
+  );
 }
