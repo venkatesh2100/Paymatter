@@ -1,102 +1,57 @@
-"use client";
-
-import { NextAuthOptions } from "next-auth";
+import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import db from "@repo/db/client";
-import { sharedAuthConfig } from "./sharedAuthConfig";
+import { AuthOptions, Session, User } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
-// Login Configuration
-const loginAuthOptions: NextAuthOptions = {
-  ...sharedAuthConfig,
+interface Credentials {
+  phone: string;
+  password: string;
+}
+
+const loginUser = async (credentials: Credentials) => {
+  try {
+    const existingUser = await db.user.findFirst({
+      where: { phonenumber: credentials.phone }
+    });
+
+    if (!existingUser) return null;
+
+    const isValidPassword = await bcrypt.compare(credentials.password, existingUser.password);
+
+    if (!isValidPassword) return null;
+
+    return {
+      id: existingUser.id.toString(),
+      name: existingUser.username,
+      email: existingUser.phonenumber
+    };
+  } catch (error) {
+    console.error("Login error:", error);
+    return null;
+  }
+};
+
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Login",
+      name: "Credentials",
       credentials: {
-        login: { label: "Username/Phone", type: "text" },
-        password: { label: "Password", type: "password" }
+        phone: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
+        password: { label: "Password", type: "password", required: true }
       },
-      async authorize(credentials) {
-        if (!credentials?.login || !credentials?.password) {
-          throw new Error("Username/Phone and password are required");
-        }
-
-        const user = await db.user.findFirst({
-          where: {
-            OR: [
-              { username: credentials.login },
-              { phonenumber: credentials.login }
-            ]
-          }
-        });
-
+      async authorize(credentials: any) {
+        const user = await loginUser(credentials);
         if (!user) throw new Error("User not found");
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) throw new Error("Invalid password");
-
-        return {
-          id: user.id.toString(),
-          username: user.username,
-          email: user.email,
-        };
+        return user;
       }
     })
   ],
-  pages: {
-    ...sharedAuthConfig.pages,
-    signIn: "/auth/login"
+  secret: process.env.JWT_SECRET || "secret",
+  callbacks: {
+    async session({ session, token }: { session: Session; token: JWT }) {
+      session.user.id = token.sub;
+      return session;
+    }
   }
 };
-
-// Signup Configuration
-const signupAuthOptions: NextAuthOptions = {
-  ...sharedAuthConfig,
-  providers: [
-    CredentialsProvider({
-      name: "Signup",
-      credentials: {
-        username: { label: "Username", type: "text" },
-        phonenumber: { label: "Phone Number", type: "text" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.username || !credentials?.phonenumber || !credentials?.password) {
-          throw new Error("All fields are required");
-        }
-
-        const existingUser = await db.user.findFirst({
-          where: {
-            OR: [
-              { username: credentials.username },
-              { phonenumber: credentials.phonenumber }
-            ]
-          }
-        });
-
-        if (existingUser) throw new Error("Username or phone already exists");
-
-        const hashedPassword = await bcrypt.hash(credentials.password, 10);
-        const newUser = await db.user.create({
-          data: {
-            username: credentials.username,
-            phonenumber: credentials.phonenumber,
-            password: hashedPassword,
-          }
-        });
-
-        return {
-          id: newUser.id.toString(),
-          username: newUser.username,
-        };
-      }
-    })
-  ],
-  pages: {
-    ...sharedAuthConfig.pages,
-    signIn: "/auth/signup"
-  }
-};
-
-// Exporting both configurations for use in the `[...nextauth].ts` route
-export { loginAuthOptions, signupAuthOptions };
