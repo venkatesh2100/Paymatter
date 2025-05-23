@@ -49,15 +49,15 @@ export const authOptions = {
       },
     }),
   ],
-  secret: process.env.JWT_SECRET || "secret",
-  callbacks: {
-    async session({ token, session }: any) {
-      session.user.id = token.sub;
-      session.user.name = token.name || null;
-      session.user.email = token.email || null;
-      return session;
-    },
-  },
+  // secret: process.env.JWT_SECRET || "secret",
+  // callbacks: {
+  //   // async session({ token, session }: any) {
+  //   //   session.user.id = token.sub;
+  //   //   session.user.name = token.name || null;
+  //   //   session.user.email = token.email || null;
+  //   //   return session;
+  //   // },
+  // },
   pages: {
     error: "/auth/error",
   },

@@ -1,11 +1,18 @@
 "use client";
 import { RecoilRoot } from "recoil";
-import { sessionProviders } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 
-export const Provider = ({ children }: { children: React.ReactNode }) => {
+interface ProviderProps {
+  children: React.ReactNode;
+  session?: any; // Consider using proper types from next-auth
+}
+
+export const Provider = ({ children, session }: ProviderProps) => {
   return (
     <RecoilRoot>
-      <sessionProviders>{children}</sessionProviders>
+      <SessionProvider session={session}>
+        {children}
+      </SessionProvider>
     </RecoilRoot>
   );
 };
