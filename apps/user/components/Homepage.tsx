@@ -3,17 +3,17 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function HomePage() {
-  const [hovered, setHovered] = useState(false);
+  // const [hovered, setHovered] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       {/* Hero Section */}
       <section
-        className={`bg-gradient-to-br from-green-100 border rounded-4xl border-blue-100 to-blue-300 flex flex-col items-center justify-center text-center min-h-screen px-6 mx-20 pt-20 relative overflow-hidden transition-all duration-500 ${hovered ? "shadow-xl" : ""}`}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        className={`bg-gradient-to-br from-green-100 border rounded-4xl border-blue-100 to-blue-300 flex flex-col items-center justify-center text-center min-h-screen px-6 mx-20 pt-20 relative overflow-hidden transition-all duration-500 ${"shadow-xl" }`}
+        // onMouseEnter={() => setHovered(true)}
+        // onMouseLeave={() => setHovered(false)}
       >
-        {hovered && (
+        {  (
           <div className="absolute inset-0 w-full h-full pointer-events-none">
             <div className="absolute left-0 top-1/2 w-0 h-0 border-[100px] border-t-transparent border-b-transparent border-r-blue-300 opacity-30 animate-lightSpeed"></div>
             <div className="absolute top-0 right-0  w-90 h-90 bg-blue-300 rounded-full animate-spinSlow"></div>

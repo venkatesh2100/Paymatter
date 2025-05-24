@@ -1,3 +1,4 @@
+// lib/auth.ts
 import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
@@ -5,7 +6,7 @@ import bcrypt from "bcrypt";
 export const authOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         login: {
           label: "Phone or Username",
@@ -16,49 +17,78 @@ export const authOptions = {
         password: { label: "Password", type: "password", required: true },
       },
       async authorize(credentials: any) {
-          console.log("auth");
+        // console.log("🔐 Authorize called with credentials:", credentials);
+
         if (!credentials) {
+          // console.error("❌ No credentials provided");
           return null;
         }
+
         const { login, password } = credentials;
 
-        const user = await db.user.findFirst({
-          where: {
-            OR: [{ phonenumber: login }, { username: login }],
-          },
-        });
+        try {
+          const user = await db.user.findFirst({
+            where: {
+              OR: [{ phonenumber: login }, { username: login }],
+            },
+          });
 
-        if (!user) {
+          if (!user) {
+            // console.warn("⚠️ No user found for:", login);
+            return null;
+          }
+
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) {
+            // console.warn("⚠️ Invalid password for user:", login);
+            return null;
+          }
+
+          // console.log("✅ User authenticated:", user.username || user.phonenumber);
+
+          return {
+            id: user.id.toString(),
+            username: user.username || "",
+            phonenumber: user.phonenumber || "",
+          };
+        } catch (error) {
+          console.error("🔥 Error during authorization:", error);
           return null;
         }
-
-        const passwordValidation = await bcrypt.compare(
-          password,
-          user.password
-        );
-        if (!passwordValidation) {
-          return null;
-        }
-
-        return {
-          id: user.id.toString(),
-          name: user.username || user.phonenumber || "User",
-          username: user.username || "",
-          phonenumber: user.phonenumber || "",
-        };
       },
     }),
   ],
-  // secret: process.env.JWT_SECRET || "secret",
-  // callbacks: {
-  //   // async session({ token, session }: any) {
-  //   //   session.user.id = token.sub;
-  //   //   session.user.name = token.name || null;
-  //   //   session.user.email = token.email || null;
-  //   //   return session;
-  //   // },
-  // },
+
+  secret: process.env.JWT_SECRET || "secret",
+
   pages: {
-    error: "/auth/error",
+    error: "/secure/error",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      // console.log("🔄 JWT callback - token before:", token, "user:", user);
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+        token.phonenumber = user.phonenumber;
+      }
+      // console.log("🔄 JWT callback - token after:", token);
+      return token;
+    },
+
+    async session({ session, token }) {
+      // console.log("🪪 Session callback - token:", token);
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id,
+          username: token.username,
+          phonenumber: token.phonenumber,
+        };
+      }
+      // console.log("🪪 Session callback - session after:", session);
+      return session;
+    },
   },
 };

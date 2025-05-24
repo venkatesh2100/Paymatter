@@ -24,10 +24,12 @@ export default function AuthError() {
   }
 
   return (
-    <div>
-      <h1>Authentication Error</h1>
-      <p>{errorMessage}</p>
-      <a href="/auth/login">Go back to Login</a>
+    <div className="flex flex-col items-center p-40 ">
+      <h1 className="text-4xl ">Authentication Error</h1>
+      <p>{errorMessage}{404}</p>
+      <div className="border border-black bg-blue-500 p-5 rounded-4xl mt-3">
+        <a href="/secure/login">Go back to Login</a>
+      </div>
     </div>
   );
 }

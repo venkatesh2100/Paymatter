@@ -28,6 +28,11 @@ const handleSubmit = async (e: React.FormEvent) => {
     console.log("Login Payload:", { login, password });
 
     console.log("SignIn Result:", result);
+    if (result === undefined) {
+      router.push("/secure/error");
+    } else {
+      router.push("/dashboard");
+    }
 
     if (result?.error) {
       console.log("Error:", result.error);
@@ -35,11 +40,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    if (result === undefined) {
-      router.push("/auth/error");
-    } else {
-      router.push("/home");
-    }
+
   } catch (error) {
     console.error("SignIn Error:", error);
     setError("An error occurred during login");
