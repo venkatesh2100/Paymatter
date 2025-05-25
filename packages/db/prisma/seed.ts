@@ -51,7 +51,7 @@ async function main() {
       },
     },
   })
-  console.log({ venky, bob })
+  // console.log({ venky, bob })
 }
 main()
   .then(async () => {

@@ -7,10 +7,10 @@ import prisma from "@repo/db/client";
 
 
 
-
-
 async function getBalance() {
     const session = await getServerSession(authOptions);
+    console.log(session);
+
     const balance = await prisma.balance.findFirst({
         where: {
             userId: Number(session?.user?.id)
@@ -21,6 +21,7 @@ async function getBalance() {
         locked: balance?.locked || 0
     }
 }
+// console.log(balance)
 
 async function getOnRampTransactions() {
     const session = await getServerSession(authOptions);
@@ -38,7 +39,7 @@ async function getOnRampTransactions() {
     }))
 }
 
-export default async function () {
+export default async function(){
     const balance = await getBalance();
     const transactions = await getOnRampTransactions();
 

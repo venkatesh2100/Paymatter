@@ -1,18 +1,25 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, MouseEventHandler } from "react";
 
 interface ButtonProps {
   children: ReactNode;
   className?: string;
-  appName: string;
+  appName?: string;   // Make this optional
+  onClick?: MouseEventHandler<HTMLButtonElement>; // <-- add onClick prop
 }
 
-export const Button = ({ children, className, appName }: ButtonProps) => {
+export const Button = ({ children, className, appName, onClick }: ButtonProps) => {
   return (
     <button
       className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
+      onClick={(e) => {
+        if (onClick) {
+          onClick(e);  // forward the click
+        } else if (appName) {
+          alert(`Hello from your ${appName} app!`);
+        }
+      }}
     >
       {children}
     </button>
