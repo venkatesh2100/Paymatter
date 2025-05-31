@@ -39,6 +39,7 @@ async function getOnRampTransactions() {
     }))
 }
 
+// eslint-disable-next-line react/display-name
 export default async function(){
     const balance = await getBalance();
     const transactions = await getOnRampTransactions();

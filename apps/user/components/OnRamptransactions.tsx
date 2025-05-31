@@ -1,4 +1,4 @@
-type TransactionStatus = "pending" | "completed" | "failed";
+type onRampstatus = "Proccesing" | "Success" | "Failed";
 import { Card } from "@repo/ui/card";
 export const OnRampTransactions = ({
   transactions,
@@ -6,7 +6,7 @@ export const OnRampTransactions = ({
   transactions: {
     time: Date;
     amount: number;
-    status: TransactionStatus;
+    status: onRampstatus;
     provider: string;
   }[];
 }) => {
