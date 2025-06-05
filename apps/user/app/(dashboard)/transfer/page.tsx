@@ -9,7 +9,7 @@ import prisma from "@repo/db/client";
 
 async function getBalance() {
     const session = await getServerSession(authOptions);
-    console.log(session);
+    // console.log(session);
 
     const balance = await prisma.balance.findFirst({
         where: {
@@ -44,11 +44,11 @@ export default async function(){
     const balance = await getBalance();
     const transactions = await getOnRampTransactions();
 
-    return <div className="w-screen">
+    return <div className="w-6xl">
         <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
             Transfer
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4 md:gap-10">
             <div>
                 <AddMoney />
             </div>

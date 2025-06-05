@@ -19,7 +19,7 @@ model User{
   email String? @unique
   username String @unique
   password String
-  phonenumber String @unique
+  phonenumber  String @unique
   balance Balance[]
   onRamptransactions onRamptransactions[]
 }

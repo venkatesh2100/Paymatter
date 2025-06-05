@@ -25,9 +25,9 @@ const handleSubmit = async (e: React.FormEvent) => {
       password,
       redirect: false,
     });
-    console.log("Login Payload:", { login, password });
+    // console.log("Login Payload:", { login, password });
 
-    console.log("SignIn Result:", result);
+    // console.log("SignIn Result:", result);
     if (result === undefined) {
       router.push("/secure/error");
     } else {

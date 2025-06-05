@@ -1,7 +1,5 @@
 import express from "express";
-// import db from "@repo/db";
-import db from "@repo/db"
-// import db from "@repo/db/client"
+import db from "@repo/db";
 const app = express();
 
 app.use(express.json());
@@ -15,11 +13,39 @@ app.post("/hdfcWebhook", async (req, res) => {
     amount: string;
   } = {
     token: req.body.token,
-    userId: req.body.user_identifier,
+    userId: req.body.userId,
     amount: req.body.amount,
   };
+  // console.log("Webhook received:", {
+  //   headers: req.headers,
+  //   body: req.body,
+  //   timestamp: new Date().toISOString(),
+  // });
+  console.log(paymentInformation);
+
+
 
   try {
+    // const processingTransactions = await db.onRamptransactions.findFirst({
+    //   where: {
+    //     token: paymentInformation.token,
+    //     status: "Proccesing",
+    //   },
+    // });
+    // if (!processingTransactions) {
+    //   return res.status(404).json({
+    //     message: "NO Transactions are Left to process",
+    //   });
+    // }\
+    const t = await db.onRamptransactions.findFirst({
+      where:{
+        token:paymentInformation.token
+      }
+    })
+    if(!t){
+      throw new Error("TOken is diff");
+    }
+
     await db.$transaction([
       db.balance.updateMany({
         where: {
@@ -29,19 +55,20 @@ app.post("/hdfcWebhook", async (req, res) => {
           amount: {
             // You can also get this from your DB
             increment: Number(paymentInformation.amount),
-        },
+          },
         },
       }),
       db.onRamptransactions.updateMany({
         where: {
           token: paymentInformation.token,
-        },
+        }
+        ,
         data: {
           status: "Success",
         },
       }),
     ]);
-
+    // console.log("success")
     res.json({
       message: "Captured",
     });
