@@ -1,11 +1,12 @@
 // lib/auth.ts
 import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
-
 
 export const authOptions = {
   providers: [
+    // Credentials Login
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -17,12 +18,8 @@ export const authOptions = {
         },
         password: { label: "Password", type: "password", required: true },
       },
-      // @ignore-ts
       async authorize(credentials?: Record<string, string>) {
-
-        if (!credentials) {
-          return null;
-        }
+        if (!credentials) return null;
 
         const { login, password } = credentials;
 
@@ -33,15 +30,10 @@ export const authOptions = {
             },
           });
 
-          if (!user) {
-            return null;
-          }
+          if (!user) return null;
 
           const passwordMatch = await bcrypt.compare(password, user.password);
-          if (!passwordMatch) {
-            return null;
-          }
-
+          if (!passwordMatch) return null;
 
           return {
             id: user.id.toString(),
@@ -54,6 +46,12 @@ export const authOptions = {
         }
       },
     }),
+
+    // Google Login
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
 
   secret: process.env.JWT_SECRET || "secret",
@@ -63,11 +61,11 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
       if (user) {
-        token.id = user.id;
-        token.username = user.username;
-        token.phonenumber = user.phonenumber;
+        token.id = user.id ?? profile?.sub;
+        token.username = user.username ?? profile?.name;
+        token.phonenumber = user.phonenumber ?? null;
       }
       return token;
     },

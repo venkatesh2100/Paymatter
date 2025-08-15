@@ -9,15 +9,11 @@ import { Provider } from "../providers";
 export default function Layout({ children }: { children: React.ReactNode }) {
   // const router = useRouter();
   const session = useSession();
-
+  // console.log(session)
   return (
     <div className="w-full max-w-screen">
       <div>
-        <Navbar
-          onSignin={signIn}
-          onSignout={() => signOut({ callbackUrl: "/secure/login" })}
-          user={session.data?.user}
-        />
+        <Navbar />
       </div>
 
       <div className="flex">
