@@ -100,7 +100,7 @@ export default function HomePage() {
                 Get Started
               </button>
             </div>
-
+            {/*
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <div className="flex -space-x-2">
                 {[...Array(4)].map((_, i) => (
@@ -116,7 +116,7 @@ export default function HomePage() {
               <p className="text-gray-600">
                 <span className="font-semibold text-gray-900">250,000+</span> active users worldwide
               </p>
-            </div>
+            </div> */}
           </div>
 
           <div className="md:w-1/2 relative">
@@ -127,12 +127,12 @@ export default function HomePage() {
                   <div className="flex justify-between items-center">
                     <div className="text-white">
                       <p className="text-sm opacity-80">Balance</p>
-                      <p className="text-2xl font-bold">$12,560.75</p>
+                      <p className="text-2xl font-bold">₹12,560.75</p>
                     </div>
                     <div className="bg-white/20 p-2 rounded-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      </svg> */}
                     </div>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function HomePage() {
                   <div className="flex justify-between mb-6">
                     <div>
                       <p className="text-sm text-gray-500">Send to</p>
-                      <p className="font-medium">John Anderson</p>
+                      <p className="font-medium">John Johnson</p>
                     </div>
                     <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
                       JA
@@ -151,7 +151,7 @@ export default function HomePage() {
                   <div className="mb-6">
                     <p className="text-sm text-gray-500 mb-2">Amount</p>
                     <div className="flex items-center border border-gray-200 rounded-lg px-4 py-3">
-                      <span className="text-gray-500 mr-2">$</span>
+                      <span className="text-gray-500 mr-2">₹</span>
                       <input
                         type="text"
                         placeholder="0.00"
@@ -177,7 +177,7 @@ export default function HomePage() {
                   </div>
                   <p className="text-xs text-gray-600">Payment sent to</p>
                   <p className="font-medium">Sarah Johnson</p>
-                  <p className="text-lg font-bold mt-2">$150.00</p>
+                  <p className="text-lg font-bold mt-2">₹150.00</p>
                 </div>
               </div>
 
@@ -190,7 +190,7 @@ export default function HomePage() {
                   </div>
                   <p className="text-xs text-gray-600">Received from</p>
                   <p className="font-medium">Alex Morgan</p>
-                  <p className="text-lg font-bold mt-2">$85.50</p>
+                  <p className="text-lg font-bold mt-2">₹85.50</p>
                 </div>
               </div>
             </div>
@@ -257,51 +257,51 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full text-sm font-medium mb-4">
-              Testimonials
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
-            <p className="text-gray-600">Join thousands of satisfied users who trust PayChey for their transactions.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
-              >
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                    <span className="font-bold text-gray-700">{testimonial.initials}</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-900">{testimonial.name}</p>
-                    <p className="text-gray-500 text-sm">{testimonial.role}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 mb-4">"{testimonial.quote}"</p>
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* <section className="py-20 bg-gray-50"> */}
+      {/*   <div className="container mx-auto px-4"> */}
+      {/*     <div className="text-center max-w-2xl mx-auto mb-16"> */}
+      {/*       <div className="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full text-sm font-medium mb-4"> */}
+      {/*         Testimonials */}
+      {/*       </div> */}
+      {/*       <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2> */}
+      {/*       <p className="text-gray-600">Join thousands of satisfied users who trust PayChey for their transactions.</p> */}
+      {/*     </div> */}
+      {/**/}
+      {/*     <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> */}
+      {/*       {testimonials.map((testimonial, index) => ( */}
+      {/*         <div */}
+      {/*           key={index} */}
+      {/*           className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm" */}
+      {/*         > */}
+      {/*           <div className="flex items-center mb-4"> */}
+      {/*             <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4"> */}
+      {/*               <span className="font-bold text-gray-700">{testimonial.initials}</span> */}
+      {/*             </div> */}
+      {/*             <div> */}
+      {/*               <p className="font-bold text-gray-900">{testimonial.name}</p> */}
+      {/*               <p className="text-gray-500 text-sm">{testimonial.role}</p> */}
+      {/*             </div> */}
+      {/*           </div> */}
+      {/*           <p className="text-gray-600 mb-4">"{testimonial.quote}"</p> */}
+      {/*           <div className="flex text-yellow-400"> */}
+      {/*             {[...Array(5)].map((_, i) => ( */}
+      {/*               <svg */}
+      {/*                 key={i} */}
+      {/*                 xmlns="http://www.w3.org/2000/svg" */}
+      {/*                 className="h-5 w-5" */}
+      {/*                 viewBox="0 0 20 20" */}
+      {/*                 fill="currentColor" */}
+      {/*               > */}
+      {/*                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /> */}
+      {/*               </svg> */}
+      {/*             ))} */}
+      {/*           </div> */}
+      {/*         </div> */}
+      {/*       ))} */}
+      {/*     </div> */}
+      {/*   </div> */}
+      {/* </section> */}
+      {/**/}
       {/* CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
