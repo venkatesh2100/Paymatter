@@ -8,6 +8,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },
+
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/react": "^19.1.4",
@@ -17,6 +18,7 @@
     "turbo": "^2.4.4",
     "typescript": "^5.7.3"
   },
+
   "engines": {
     "node": ">=18"
   },
