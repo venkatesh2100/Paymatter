@@ -18,7 +18,14 @@ interface Transaction {
   status: string;
   provider: string;
 }
-
+interface FrormatedTransactions {
+    id: number;
+    time: Date;
+    amount: number;
+    status: string;
+    provider: string;
+    currency: string;
+}
 async function getBalance() {
    const session = await getServerSession(authOptions);
   const user = session?.user as CustomUser | undefined;
@@ -127,7 +134,7 @@ export default async function TransferDashboard() {
               </p>
             </div>
             <div className="space-y-4">
-              {transactions.slice(0, 5).map((txn) => (
+              {transactions.slice(0, 5).map((txn:FrormatedTransactions) => (
                 <div key={txn.id} className="border-b border-gray-100 pb-3 last:border-0">
                   <div className="flex justify-between">
                     <div>
