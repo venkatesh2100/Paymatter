@@ -1,19 +1,27 @@
 "use client";
+
 import { Button } from "@repo/ui/button";
 import { Center } from "@repo/ui/center";
 import { TextInput } from "@repo/ui/textInput";
 import { Card } from "@repo/ui/card";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { P2Ptransactions } from "../app/lib/actions/p2pTranscations";
 import { AnimatePresence, motion } from "framer-motion";
 import successAnimation from "../public/animations/success.json";
-import { Player } from "@lottiefiles/react-lottie-player";
+import dynamic from "next/dynamic";
 import { FaSpinner, FaTimesCircle } from "react-icons/fa";
+import type { AnimationItem } from "lottie-web";
+
+// Dynamically import Player so it won’t SSR
+const PlayerSSR = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player),
+  { ssr: false }
+);
 
 export default function SendCard() {
   const [phone_number, Setphone_number] = useState("");
   const [Amount, SetAmount] = useState("");
-  const playerRef = useRef<Player>(null);
+  const [animationInstance, setAnimationInstance] = useState<AnimationItem | null>(null);
   const successAnimationLength = 90;
 
   const [status, setStatus] = useState<
@@ -41,12 +49,12 @@ export default function SendCard() {
           <Card title="Send Money">
             <div>
               <TextInput
-                placeholder={phone_number}
+                placeholder="Account Number"
                 label="Account Number"
                 onChange={(value) => Setphone_number(value)}
               />
               <TextInput
-                placeholder={Amount}
+                placeholder="Amount"
                 label="Amount "
                 onChange={(value) => SetAmount(value)}
               />
@@ -65,7 +73,7 @@ export default function SendCard() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-40 backdrop-blur-sm"
             onClick={() => setStatus("idle")}
           >
             <motion.div
@@ -73,7 +81,7 @@ export default function SendCard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-white rounded-2xl  shadow-2xl p-10 flex flex-col items-center space-y-6 w-80 text-center relative"
+              className="bg-white rounded-2xl shadow-2xl p-10 flex flex-col items-center space-y-6 w-80 text-center relative"
               onClick={(e) => e.stopPropagation()}
             >
               {status === "processing" && (
@@ -92,16 +100,18 @@ export default function SendCard() {
               )}
               {status === "success" && (
                 <>
-                  <Player
-                    ref={playerRef}
+                  <PlayerSSR
                     autoplay
                     loop={false}
                     speed={0.9}
                     src={successAnimation}
                     style={{ height: 250, width: 450 }}
+                    lottieRef={(instance: AnimationItem) => {
+                      setAnimationInstance(instance);
+                    }}
                     onEvent={(event) => {
-                      if (event === "complete" && playerRef.current) {
-                        playerRef.current.setSeeker(successAnimationLength);
+                      if (event === "complete" && animationInstance) {
+                        animationInstance.goToAndStop(successAnimationLength, true);
                       }
                     }}
                   />
@@ -109,7 +119,7 @@ export default function SendCard() {
                     Payment Successful!
                   </p>
                   <p className="text-sm text-gray-500">
-                    Money sent Succesfully! 🎉
+                    Money sent Successfully! 🎉
                   </p>
                 </>
               )}
