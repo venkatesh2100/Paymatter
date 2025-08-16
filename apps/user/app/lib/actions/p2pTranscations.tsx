@@ -1,7 +1,7 @@
 "use server";
 
 import { getServerSession } from "next-auth";
-import prisma from "@repo/db/client";
+import prisma from "@repo/db";
 import { authOptions } from "../auth";
 export async function P2Ptransactions(phone_number: number, amount: number) {
   const session = await getServerSession(authOptions);

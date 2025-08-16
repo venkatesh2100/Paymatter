@@ -1,5 +1,5 @@
 // lib/auth.ts
-import db from "@repo/db/client";
+import db from "@repo/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
@@ -22,7 +22,7 @@ declare module "next-auth/jwt" {
     id?: string;
     username?: string;
     phonenumber?: string;
-    account?: string; 
+    account?: string;
   }
 }
 

@@ -1,6 +1,6 @@
 // app/api/signup/route.ts
 import { NextResponse } from "next/server";
-import db from "@repo/db/client";
+import db from "@repo/db";
 import bcrypt from "bcrypt";
 import { getServerSession } from "next-auth";
 
