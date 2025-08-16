@@ -11,6 +11,14 @@ interface CustomUser {
   phonenumber?: string;
 }
 
+interface Transaction {
+  id: number;
+  startTime: Date;
+  amount: number;
+  status: string;
+  provider: string;
+}
+
 async function getBalance() {
    const session = await getServerSession(authOptions);
   const user = session?.user as CustomUser | undefined;
@@ -36,7 +44,7 @@ async function getOnRampTransactions() {
       startTime: "desc"
     }
   });
-  return txns.map(t => ({
+  return txns.map((t : Transaction) => ({
     id: t.id,
     time: t.startTime,
     amount: t.amount,
