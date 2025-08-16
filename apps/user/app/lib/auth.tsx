@@ -1,5 +1,5 @@
 // lib/auth.ts
-import db from "@repo/db";
+import prisma from "@repo/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
@@ -46,7 +46,7 @@ export const authOptions: AuthOptions = {
         const { login, password } = credentials;
 
         try {
-          const user = await db.user.findFirst({
+          const user = await prisma.user.findFirst({
             where: {
               OR: [{ phonenumber: login }, { username: login }],
             },

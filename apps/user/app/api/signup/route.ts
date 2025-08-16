@@ -1,6 +1,6 @@
 // app/api/signup/route.ts
 import { NextResponse } from "next/server";
-import db from "@repo/db";
+import prisma from "@repo/db";
 import bcrypt from "bcrypt";
 import { getServerSession } from "next-auth";
 
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const existingUser = await db.user.findFirst({
+  const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ username }, { phonenumber }],
     },
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await db.user.create({
+    const user = await prisma.user.create({
       data: {
         username,
         phonenumber,
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       },
     });
 
-    await db.balance.create({
+    await prisma.balance.create({
       data: {
         amount: 0,
         locked: 0,

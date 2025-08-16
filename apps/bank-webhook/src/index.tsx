@@ -1,5 +1,5 @@
 import express from "express";
-import db from "@repo/db";
+import prisma from "@repo/db";
 const app = express();
 
 app.use(express.json());
@@ -26,7 +26,7 @@ app.post("/hdfcWebhook", async (req, res) => {
 
 
   try {
-    const t = await db.onRamptransactions.findFirst({
+    const t = await prisma.onRamptransactions.findFirst({
       where:{
         token:paymentInformation.token
       }
@@ -35,19 +35,19 @@ app.post("/hdfcWebhook", async (req, res) => {
       throw new Error("TOken is diff");
     }
 
-    await db.$transaction([
-      db.balance.updateMany({
+    await prisma.$transaction([
+      prisma.balance.updateMany({
         where: {
           userId: Number(paymentInformation.userId),
         },
         data: {
           amount: {
-            // You can also get this from your DB
+            // You can also get this from your prisma
             increment: Number(paymentInformation.amount),
           },
         },
       }),
-      db.onRamptransactions.updateMany({
+      prisma.onRamptransactions.updateMany({
         where: {
           token: paymentInformation.token,
         }
