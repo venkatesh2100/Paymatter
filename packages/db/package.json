@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.8.0",
+    "@prisma/extension-accelerate": "^2.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
@@ -16,7 +17,7 @@
     "prisma": "^6.8.0"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate &&  tsc",
     "dev": "ts-node ./src/index.ts",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
