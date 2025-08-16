@@ -5,7 +5,14 @@ import prisma from "@repo/db/client";
 import { authOptions } from "../auth";
 export async function P2Ptransactions(phone_number: number, amount: number) {
   const session = await getServerSession(authOptions);
-  const from = session?.user?.id;
+  interface CustomUser {
+    id: string;
+    username?: string;
+    phonenumber?: string;
+  }
+
+  const user = session?.user as CustomUser | undefined;
+  const from = user?.id;
 
   if (!from) {
     return {

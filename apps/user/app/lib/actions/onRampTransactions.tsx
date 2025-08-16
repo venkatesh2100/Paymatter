@@ -2,38 +2,38 @@
 import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth";
+import { randomUUID } from "crypto"
 
-export default async function CreateOnRampTractions(
+
+export default async function CreateOnRampTransactions(
   provider: string,
   amount: string
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !session.user?.id) {
-    return {
-      message: "User is not authenticated.",
-    };
-  }
+  console.log("Session:", session);
+  if (!session?.user?.id) throw new Error("User not found");
 
-  const token = (Math.random() * 1000).toString();
-  const userID = Number(session?.user?.id);
-  await prisma.onRamptransactions.create({
-    data: {
-      provider: provider,
-      status: "Proccesing",
-      amount: Number(amount) * 100,
-      userId: userID,
-      token: token,
-      startTime: new Date(),
-    },
-  });
+  const userID = Number(session?.user.id);
+  const token = randomUUID();
+ await prisma.onRamptransactions.create({
+  data: {
+    provider,
+    status: "Processing",
+    amount: Number(amount) * 100,
+    userId: userID,
+    token,
+    startTime: new Date(),
+  },
+});
+
+
+
   try {
     const response = await fetch("http://localhost:3003/hdfcWebhook", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        token: token,
+        token,
         userId: userID,
         amount: Number(amount) * 100,
       }),
@@ -41,12 +41,9 @@ export default async function CreateOnRampTractions(
 
     const json = await response.json();
     console.log("Webhook response:", json);
-
   } catch (e) {
     console.error("Error calling webhook:", e);
   }
 
-  return {
-    message: "Transaction is Updated!",
-  };
+  return { message: "Transaction is Updated!" };
 }

@@ -1,14 +1,12 @@
 "use client";
 
 import { SidebarItem } from "../../components/Sidebar";
-import Navbar from "@repo/ui/appbar";
-import { signIn, signOut, useSession } from "next-auth/react";
+import Navbar from "../../components/appbar";
 // import { useRouter } from "next/navigation";
 import { Provider } from "../providers";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   // const router = useRouter();
-  const session = useSession();
   // console.log(session)
   return (
     <div className="w-full max-w-screen">
@@ -17,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="flex">
-        <div className="w-52 border-r border-slate-300 min-h-screen mr-4 pt-28">
+        <div className="w-64 border-r border-slate-300 min-h-screen mr-4 pt-28">
           <div>
             <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Home" />
             <SidebarItem
@@ -31,7 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               title="Transfer"
             />
           </div>
-          <SidebarItem href="/p2p" icon={<P2pIcon />} title="P2p" />
+          <SidebarItem href="/send-receive" icon={<P2pIcon />} title="Send & Recive" />
         </div>
         {/* {children} */}
         <div>

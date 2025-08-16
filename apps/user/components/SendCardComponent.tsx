@@ -8,15 +8,13 @@ import { P2Ptransactions } from "../app/lib/actions/p2pTranscations";
 import { AnimatePresence, motion } from "framer-motion";
 import successAnimation from "../public/animations/success.json";
 import { Player } from "@lottiefiles/react-lottie-player";
-
 import { FaSpinner, FaTimesCircle } from "react-icons/fa";
 
 export default function SendCard() {
   const [phone_number, Setphone_number] = useState("");
   const [Amount, SetAmount] = useState("");
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<Player>(null);
   const successAnimationLength = 90;
-  // const [backerror, setError] = useState('');
 
   const [status, setStatus] = useState<
     "idle" | "success" | "processing" | "failed"
@@ -103,10 +101,7 @@ export default function SendCard() {
                     style={{ height: 250, width: 450 }}
                     onEvent={(event) => {
                       if (event === "complete" && playerRef.current) {
-                        playerRef.current.goToAndStop(
-                          successAnimationLength,
-                          true
-                        );
+                        playerRef.current.setSeeker(successAnimationLength);
                       }
                     }}
                   />
@@ -124,7 +119,6 @@ export default function SendCard() {
                   <p className="text-xl font-bold text-red-600">
                     Payment Failed
                   </p>
-                  {/* <p>{backerror}</p> */}
                   <p className="text-sm text-gray-500">Please try again</p>
                 </>
               )}

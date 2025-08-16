@@ -3,8 +3,30 @@ import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
+import { AuthOptions, User } from "next-auth";
 
-export const authOptions = {
+import { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id?: string;
+      username?: string;
+      phonenumber?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    username?: string;
+    phonenumber?: string;
+    account?: string; 
+  }
+}
+
+export const authOptions: AuthOptions = {
   providers: [
     // Credentials Login
     CredentialsProvider({
@@ -18,7 +40,7 @@ export const authOptions = {
         },
         password: { label: "Password", type: "password", required: true },
       },
-      async authorize(credentials?: Record<string, string>) {
+      async authorize(credentials) {
         if (!credentials) return null;
 
         const { login, password } = credentials;
@@ -39,7 +61,7 @@ export const authOptions = {
             id: user.id.toString(),
             username: user.username || "",
             phonenumber: user.phonenumber || "",
-          };
+          } as User;
         } catch (error) {
           console.error("🔥 Error during authorization:", error);
           return null;
@@ -63,9 +85,17 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user, account, profile }) {
       if (user) {
-        token.id = user.id ?? profile?.sub;
-        token.username = user.username ?? profile?.name;
-        token.phonenumber = user.phonenumber ?? null;
+        // Cast user to your custom type
+        const customUser = user as User & {
+          id?: string;
+          username?: string;
+          phonenumber?: string;
+        };
+
+        token.account = account?.provider || "";
+        token.id = customUser.id ?? profile?.sub;
+        token.username = customUser.username ?? profile?.name;
+        token.phonenumber = customUser.phonenumber ?? undefined;
       }
       return token;
     },

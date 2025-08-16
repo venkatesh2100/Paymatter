@@ -1,11 +1,11 @@
 
-export * from "@prisma/client";
-import HomePage from "../../components/Homepage";
+// export * from "@prisma/client";
+import GamifiedHomepage from "../../components/GameHomepage";
 export default function Home() {
-
   return (
     <div>
-      <HomePage />
+      {/* <HomePage /> */}
+      <GamifiedHomepage />
     </div>
   );
 }

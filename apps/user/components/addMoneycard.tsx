@@ -22,7 +22,7 @@ export const AddMoney = () => {
 
   const [amount, setAmount] = useState("");
   const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<Player>(null);
   const successAnimationLength = 90;
   const [status, setStatus] = useState<
     "idle" | "processing" | "success" | "failed"
@@ -102,7 +102,7 @@ export const AddMoney = () => {
                   />
                 </>
               )}
-              {status === "success" && (
+            {status === "success" && (
                 <>
                   <Player
                     ref={playerRef}
@@ -113,10 +113,7 @@ export const AddMoney = () => {
                     style={{ height: 250, width: 450 }}
                     onEvent={(event) => {
                       if (event === "complete" && playerRef.current) {
-                        playerRef.current.goToAndStop(
-                          successAnimationLength,
-                          true
-                        );
+                        playerRef.current.setSeeker(successAnimationLength);
                       }
                     }}
                   />
@@ -124,7 +121,7 @@ export const AddMoney = () => {
                     Payment Successful!
                   </p>
                   <p className="text-sm text-gray-500">
-                    Funds added to your wallet 🎉
+                    Money sent Succesfully! 🎉
                   </p>
                 </>
               )}

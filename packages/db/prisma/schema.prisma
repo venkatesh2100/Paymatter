@@ -67,7 +67,7 @@ enum Auth_type{
 }
 
 enum onRampstatus{
-  Proccesing
+  Processing
   Failed
   Success
 }

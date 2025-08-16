@@ -1,28 +1,75 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
 
   return (
-    <nav className="flex items-center border rounded-xl border-white justify-between px-8 py-4 bg-gradient-to-r from-blue-300 to-cyan-200 shadow-md">
+    <nav className="container mx-auto px-4 py-4 flex justify-between  rounded-xl">
+      {/* Logo */}
       <div
-        className="text-3xl font-extrabold text-gray-900 cursor-pointer"
+        className="flex items-center space-x-3 cursor-pointer"
         onClick={() => router.push("/")}
       >
-        Paymatter
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+          </div>
+        </div>
+        <span className="text-xl font-bold text-gray-900">
+          Pay<span className="text-indigo-600">Chey</span>
+        </span>
       </div>
 
-      <div className="hidden md:flex space-x-6 text-gray-900">
-        <span className="cursor-pointer hover:text-blue-500" onClick={() => router.push("/send-receive")}>Send & Receive</span>
-        <span className="cursor-pointer hover:text-blue-500" onClick={() => router.push("/pay-now")}>Pay Now</span>
-        <span className="cursor-pointer hover:text-blue-500" onClick={() => router.push("/help")}>Help Center</span>
+      {/* Nav Links */}
+      <div className="hidden md:flex space-x-8 text-gray-900 font-medium">
+        <span
+          className="cursor-pointer hover:text-indigo-600 transition"
+          onClick={() => router.push("/")}
+        >
+          Home
+        </span>
+        <span
+          className="cursor-pointer hover:text-indigo-600 transition"
+          onClick={() => router.push("/leaderboard")}
+        >
+          Leaderboard
+        </span>
+        <span
+          className="cursor-pointer hover:text-indigo-600 transition"
+          onClick={() => router.push("/rewards")}
+        >
+          Rewards
+        </span>
+        <span
+          className="cursor-pointer hover:text-indigo-600 transition"
+          onClick={() => router.push("/achievements")}
+        >
+          Achievements
+        </span>
+        <span
+          className="cursor-pointer hover:text-indigo-600 transition"
+          onClick={() => router.push("/help")}
+        >
+          Help center
+        </span>
       </div>
 
-      <div className="space-x-4">
-        <button className="px-6 py-2 text-blue-600 bg-gradient-to-r from-blue-300 to-emerald-200 rounded-3xl font-medium" onClick={() => router.push("/secure/login")}>Login</button>
-        <button className="px-6 py-2 text-blue-600 rounded-3xl bg-gradient-to-l from-blue-200 to-cyan-300 font-medium" onClick={() => router.push("/secure/signup")}>Signup</button>
+      {/* Actions */}
+      <div className="flex items-center space-x-4">
+        <button
+          className="hidden md:block text-gray-600 hover:text-indigo-600 transition font-medium"
+          onClick={() => router.push("/secure/login")}
+        >
+          Log In
+        </button>
+        <button
+          className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-5 py-2 rounded-lg font-medium transition transform hover:-translate-y-0.5 shadow-md"
+          onClick={() => router.push("/secure/signup")}
+        >
+          Play Now
+        </button>
       </div>
     </nav>
   );
