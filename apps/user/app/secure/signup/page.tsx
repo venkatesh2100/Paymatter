@@ -1,9 +1,9 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import {  Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,28 +12,142 @@ export default function SignupPage() {
     phonenumber: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null
+  );
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
+  // Reset OTP state when email changes
+  useEffect(() => {
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtp("");
+  }, [formData.email]);
+
+  // Username availability check
+  useEffect(() => {
+    if (!formData.username) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/check-username?username=${formData.username}`
+        );
+        const data = await res.json();
+        setUsernameAvailable(data.available);
+      } catch (err) {
+        console.error("Error checking username", err);
+        setUsernameAvailable(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [formData.username]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const sendOtp = async () => {
+    if (!formData.email) {
+      setError("Please enter email first");
+      return;
+    }
+
+    if (!validateEmail(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setIsSendingOtp(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to send OTP");
+        return;
+      }
+
+      setOtpSent(true);
+    } catch (err) {
+      console.error("Send OTP error:", err);
+      setError("Failed to send OTP");
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const verifyOtp = async () => {
+    if (!otp) {
+      setError("Please enter OTP");
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "OTP verification failed");
+        return;
+      }
+
+      setOtpVerified(true);
+    } catch (err) {
+      console.error("Verify OTP error:", err);
+      setError("OTP verification failed");
+    } finally {
+      setIsVerifyingOtp(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    // console.log(formData)
+
     // Validation
-    if (!formData.username || !formData.phonenumber || !formData.password) {
+    if (
+      !formData.username ||
+      !formData.phonenumber ||
+      !formData.email ||
+      !formData.password
+    ) {
       setError("Please fill in all fields");
       setIsLoading(false);
       return;
@@ -51,18 +165,22 @@ export default function SignupPage() {
       return;
     }
 
+    if (!otpVerified) {
+      setError("Please verify your email first");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // 1. Create user
+      // Create user
       const res = await fetch("/api/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: formData.username,
           phonenumber: formData.phonenumber,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }),
       });
 
@@ -74,9 +192,9 @@ export default function SignupPage() {
         return;
       }
 
-      // 2. Auto-login after successful signup
+      // Auto-login after successful signup
       const loginRes = await signIn("credentials", {
-        login: formData.username || formData.phonenumber,
+        login: formData.email,
         password: formData.password,
         redirect: false,
       });
@@ -88,11 +206,23 @@ export default function SignupPage() {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      setError("An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Check form validity for submit button
+  const isFormValid =
+    formData.username &&
+    formData.phonenumber &&
+    formData.email &&
+    formData.password &&
+    formData.confirmPassword &&
+    formData.password === formData.confirmPassword &&
+    formData.password.length >= 8 &&
+    otpVerified &&
+    usernameAvailable === true;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -115,7 +245,9 @@ export default function SignupPage() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Create Your Account</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Create Your Account
+          </h1>
           <p className="text-gray-600 mt-2">Join us today to get started</p>
         </div>
 
@@ -156,6 +288,16 @@ export default function SignupPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 placeholder="Enter your username"
               />
+              {usernameAvailable === true && (
+                <p className="text-green-600 text-sm mt-1">
+                  U are Special! I think u got it.
+                </p>
+              )}
+              {usernameAvailable === false && (
+                <p className="text-red-600 text-sm mt-1">
+                   Need to Change your Name I think ?
+                </p>
+              )}
             </div>
 
             <div>
@@ -181,23 +323,90 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder="Enter your email "
-              />
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+                    placeholder="Enter your email"
+                  />
+                  <button
+                    type="button"
+                    onClick={sendOtp}
+                    disabled={isSendingOtp || !formData.email}
+                    className={`px-4 py-3 rounded-lg font-medium ${
+                      isSendingOtp || !formData.email
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-blue-500 text-white hover:bg-blue-600"
+                    }`}
+                  >
+                    {isSendingOtp ? (
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    ) : otpSent ? (
+                      "Resend OTP"
+                    ) : (
+                      "Send OTP"
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {otpSent && (
+                <div className="space-y-2">
+                  <label
+                    htmlFor="otp"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Enter OTP
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      id="otp"
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+                      placeholder="Enter OTP"
+                    />
+                    <button
+                      type="button"
+                      onClick={verifyOtp}
+                      disabled={isVerifyingOtp || otpVerified || !otp}
+                      className={`px-4 py-3 rounded-lg font-medium min-w-[100px] ${
+                        isVerifyingOtp || otpVerified || !otp
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-green-500 text-white hover:bg-green-600"
+                      }`}
+                    >
+                      {isVerifyingOtp ? (
+                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                      ) : otpVerified ? (
+                        "Verified"
+                      ) : (
+                        "Verify"
+                      )}
+                    </button>
+                  </div>
+                  {otpVerified && (
+                    <p className="text-green-600 text-sm mt-1">
+                      ✅ Email verified
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
+
             <div>
               <label
                 htmlFor="password"
@@ -262,11 +471,12 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition flex items-center justify-center ${isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 hover:shadow-md"
-                }`}
+              disabled={isLoading || !isFormValid}
+              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition flex items-center justify-center ${
+                isLoading || !isFormValid
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 hover:shadow-md"
+              }`}
             >
               {isLoading ? (
                 <>

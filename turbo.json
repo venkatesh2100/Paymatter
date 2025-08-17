@@ -8,7 +8,9 @@
     "NEXTAUTH_URL",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
-    "DATABASE_URL"
+    "DATABASE_URL",
+    "SMTP_USER",
+    "SMTP_PASS"
   ],
   "globalDependencies": [
     ".env",
@@ -19,12 +21,14 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**",".next/**", "!.next/cache/**"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
         "NEXTAUTH_SECRET",
         "DATABASE_URL",
         "GOOGLE_CLIENT_ID",
-        "GOOGLE_CLIENT_SECRET"
+        "GOOGLE_CLIENT_SECRET",
+        "SMTP_USER",
+        "SMTP_PASS"
       ]
     },
     "lint": {
@@ -40,7 +44,9 @@
         "NEXTAUTH_SECRET",
         "DATABASE_URL",
         "GOOGLE_CLIENT_ID",
-        "GOOGLE_CLIENT_SECRET"
+        "GOOGLE_CLIENT_SECRET",
+        "SMTP_USER",
+        "SMTP_PASS"
       ]
     },
     "db:generate": {

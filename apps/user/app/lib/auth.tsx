@@ -33,9 +33,9 @@ export const authOptions: AuthOptions = {
       name: "credentials",
       credentials: {
         login: {
-          label: "Phone or Username",
+          label: "username or email",
           type: "text",
-          placeholder: "Enter your phone number or username",
+          placeholder: "Enter your phone number or email",
           required: true,
         },
         password: { label: "Password", type: "password", required: true },
@@ -48,7 +48,7 @@ export const authOptions: AuthOptions = {
         try {
           const user = await prisma.user.findFirst({
             where: {
-              OR: [{ phonenumber: login }, { username: login }],
+              OR: [{ username: login }, { email: login }],
             },
           });
 
@@ -61,6 +61,7 @@ export const authOptions: AuthOptions = {
             id: user.id.toString(),
             username: user.username || "",
             phonenumber: user.phonenumber || "",
+            email: user.email || "",
           } as User;
         } catch (error) {
           console.error("🔥 Error during authorization:", error);
@@ -90,12 +91,14 @@ export const authOptions: AuthOptions = {
           id?: string;
           username?: string;
           phonenumber?: string;
+          email?: string;
         };
 
         token.account = account?.provider || "";
         token.id = customUser.id ?? profile?.sub;
         token.username = customUser.username ?? profile?.name;
         token.phonenumber = customUser.phonenumber ?? undefined;
+        token.email = customUser.email ?? profile?.email ?? undefined;
       }
       return token;
     },
@@ -107,6 +110,7 @@ export const authOptions: AuthOptions = {
           id: token.id,
           username: token.username,
           phonenumber: token.phonenumber,
+          email: token.email,
         };
       }
       return session;
