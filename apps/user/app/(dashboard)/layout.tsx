@@ -2,12 +2,9 @@
 
 import { SidebarItem } from "../../components/Sidebar";
 import Navbar from "../../components/appbar";
-// import { useRouter } from "next/navigation";
 import { Provider } from "../providers";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  // const router = useRouter();
-  // console.log(session)
   return (
     <div className="w-full max-w-screen">
       <div>
