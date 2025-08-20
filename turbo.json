@@ -1,7 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-
   "globalEnv": [
     "NEXTAUTH_SECRET",
     "JWT_SECRET",
@@ -9,6 +8,7 @@
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "DATABASE_URL",
+    "REDIS_URL",
     "SMTP_USER",
     "SMTP_PASS"
   ],
@@ -19,23 +19,37 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [
         "NEXTAUTH_SECRET",
         "DATABASE_URL",
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "SMTP_USER",
+        "REDIS_URL",
         "SMTP_PASS"
       ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     },
     "dev": {
       "cache": false,
@@ -44,6 +58,7 @@
         "NEXTAUTH_SECRET",
         "DATABASE_URL",
         "GOOGLE_CLIENT_ID",
+        "REDIS_URL",
         "GOOGLE_CLIENT_SECRET",
         "SMTP_USER",
         "SMTP_PASS"
@@ -51,11 +66,15 @@
     },
     "db:generate": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": [
+        "DATABASE_URL"
+      ]
     },
     "db:push": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": [
+        "DATABASE_URL"
+      ]
     }
   }
 }

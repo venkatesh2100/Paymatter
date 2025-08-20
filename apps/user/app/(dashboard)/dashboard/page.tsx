@@ -1,3 +1,11 @@
-export default function DashboardPage() {
-  return <div>dashboard</div>;
+import LeaderboardPage from "../../../components/dashboard/leaderboard";
+
+
+export default function dashboard() {
+  return (
+    <div>
+      <LeaderboardPage />
+    </div>
+  )
 }
+

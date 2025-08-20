@@ -295,7 +295,7 @@ export default function SignupPage() {
               )}
               {usernameAvailable === false && (
                 <p className="text-red-600 text-sm mt-1">
-                   Need to Change your Name I think ?
+                  Need to Change your Name I think ?
                 </p>
               )}
             </div>
@@ -345,11 +345,10 @@ export default function SignupPage() {
                     type="button"
                     onClick={sendOtp}
                     disabled={isSendingOtp || !formData.email}
-                    className={`px-4 py-3 rounded-lg font-medium ${
-                      isSendingOtp || !formData.email
+                    className={`px-4 py-3 rounded-lg font-medium ${isSendingOtp || !formData.email
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-500 text-white hover:bg-blue-600"
-                    }`}
+                      }`}
                   >
                     {isSendingOtp ? (
                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -383,11 +382,10 @@ export default function SignupPage() {
                       type="button"
                       onClick={verifyOtp}
                       disabled={isVerifyingOtp || otpVerified || !otp}
-                      className={`px-4 py-3 rounded-lg font-medium min-w-[100px] ${
-                        isVerifyingOtp || otpVerified || !otp
+                      className={`px-4 py-3 rounded-lg font-medium min-w-[100px] ${isVerifyingOtp || otpVerified || !otp
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-green-500 text-white hover:bg-green-600"
-                      }`}
+                        }`}
                     >
                       {isVerifyingOtp ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -400,7 +398,7 @@ export default function SignupPage() {
                   </div>
                   {otpVerified && (
                     <p className="text-green-600 text-sm mt-1">
-                      ✅ Email verified
+                      Email verified
                     </p>
                   )}
                 </div>
@@ -472,11 +470,10 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading || !isFormValid}
-              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition flex items-center justify-center ${
-                isLoading || !isFormValid
+              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition flex items-center justify-center ${isLoading || !isFormValid
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 hover:shadow-md"
-              }`}
+                }`}
             >
               {isLoading ? (
                 <>

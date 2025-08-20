@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import redis from "../../lib/redis";
 
-const otpStore: { [email: string]: { otp: string; expires: number } } = {};
 
 export async function POST(req: Request) {
   try {
@@ -11,11 +11,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
+    await redis.set(`otp:${email}`, otp, "EX", 300);
     // Store OTP in memory (valid for 5 minutes)
-    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
 
     // Setup nodemailer
     const transporter = nodemailer.createTransport({
