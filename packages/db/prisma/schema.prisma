@@ -13,60 +13,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                  Int                  @id @default(autoincrement())
+  email               String?              @unique
+  username            String               @unique
+  password            String
+  phonenumber         String               @unique
+  balance             Balance[]
+  onRamptransactions  onRamptransactions[]
+  recivcetransactions P2PTransaction[]     @relation("ReceivedTransactions")
+  sendtransactions    P2PTransaction[]     @relation("SentTransactions")
 
-model User{
-  id Int @id @default(autoincrement())
-  email String? @unique
-  username String @unique
-  password String
-  phonenumber  String @unique
-  balance Balance[]
-  onRamptransactions onRamptransactions[]
-  recivcetransactions P2PTransaction[] @relation("ReceivedTransactions")
-  sendtransactions P2PTransaction[] @relation("SentTransactions")
+  streakCount    Int?      @default(0) // current streak
+  lastStreakDate DateTime? // last active day
+  longestStreak  Int?      @default(0) // optional, to track best streak
 }
 
-model Merchant{
-  id Int @id @default(autoincrement())
-  email String @unique
-  username String
-  password String
-  phonenumber String @unique
-  Auth_type Auth_type
+model Merchant {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  username    String
+  password    String
+  phonenumber String    @unique
+  Auth_type   Auth_type
 }
-model onRamptransactions{
-  id Int @id @default(autoincrement())
-  status onRampstatus
-  provider String
-  amount Int
-  token String @unique
+
+model onRamptransactions {
+  id        Int          @id @default(autoincrement())
+  status    onRampstatus
+  provider  String
+  amount    Int
+  token     String       @unique
   startTime DateTime
-  userId Int
-  user User @relation(fields: [userId],references: [id])
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id])
 }
-model Balance{
-  id Int @id @default(autoincrement())
-  userId Int @unique
+
+model Balance {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
   amount Int
   locked Int
-  user User @relation(fields: [userId],references: [id])
-}
-model P2PTransaction {
-  id         Int   @id @default(autoincrement())
-  senderID   Int
-  reciverID  Int
-  amount     Int
-  sender     User     @relation("SentTransactions", fields: [senderID], references: [id])
-  receiver   User     @relation("ReceivedTransactions", fields: [reciverID], references: [id])
-  createdAt  DateTime @default(now())
+  user   User @relation(fields: [userId], references: [id])
 }
 
-enum Auth_type{
+model P2PTransaction {
+  id        Int      @id @default(autoincrement())
+  senderID  Int
+  reciverID Int
+  amount    Int
+  sender    User     @relation("SentTransactions", fields: [senderID], references: [id])
+  receiver  User     @relation("ReceivedTransactions", fields: [reciverID], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum Auth_type {
   GOOGLE
   GITHUB
 }
 
-enum onRampstatus{
+enum onRampstatus {
   Processing
   Failed
   Success

@@ -16,40 +16,50 @@ type Leader = {
 export default function LeaderboardPage() {
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [myRank, setMyRank] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const { data: session } = useSession();
 
   const currentUserId = session?.user?.id
     ? Number(session.user.id)
     : undefined;
+
+  console.log(currentUserId,session)
   useEffect(() => {
     async function fetchLeaderboard() {
-      const res = await fetch("/api/lboard");
-      const data = await res.json();
+      try {
+        const res = await fetch("/api/lboard");
+        const data = await res.json();
 
-      const formatted: Leader[] = (data.leaderboard || []).map(
-        (player: Leader, index: number) => ({
-          ...player,
-          rank: index + 1,
-          streak: Math.floor(Math.random() * 10) + 1,
-        })
-      );
-      setLeaders(formatted);
-
-      if (currentUserId) {
-        const me = formatted.find((p) => p.id === Number(currentUserId));
-        setMyRank(me ? me.rank! : null);
+        const formatted: Leader[] = (data.leaderboard || []).map(
+          (player: Leader, index: number) => ({
+            ...player,
+            rank: index + 1,
+            streak: Math.floor(Math.random() * 10) + 1,
+          })
+        );
+        setLeaders(formatted);
+        if (currentUserId) {
+          const me = formatted.find((p) => p.id === Number(currentUserId));
+          setMyRank(me ? me.rank! : null);
+        }
+      } catch (err) {
+        console.error("Error fetching leaderboard", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchLeaderboard();
   }, [currentUserId]);
 
   return (
-    <section className="max-w-4xl mx-auto mt-10 mb-16">
+    <section className="max-w-4xl mx-auto mt-10 mb-16 px-4">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">Global Leaderboard</h2>
-        <div className="flex items-center text-indigo-600">
+      <div className="flex justify-between items-center mb-6 flex-wrap">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          Global Leaderboard
+        </h2>
+        <div className="flex items-center text-indigo-600 mt-2 sm:mt-0">
           {myRank ? (
             <>
               <span className="mr-2 font-medium">Your rank: #{myRank}</span>
@@ -58,14 +68,15 @@ export default function LeaderboardPage() {
               </div>
             </>
           ) : (
-            <span className="text-gray-500"></span>
+            <span className="text-gray-500 text-sm">Not ranked yet</span>
           )}
         </div>
       </div>
 
-      {/* Table header */}
+      {/* Table container */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
-        <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-indigo-50 border-b border-gray-200 font-semibold text-gray-700">
+        {/* Table header (hidden on mobile) */}
+        <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-indigo-50 border-b border-gray-200 font-semibold text-gray-700">
           <div className="col-span-1">Rank</div>
           <div className="col-span-6">Player</div>
           <div className="col-span-3">Balance</div>
@@ -74,49 +85,74 @@ export default function LeaderboardPage() {
 
         {/* Table rows */}
         <div className="divide-y divide-gray-100">
-          {leaders.map((player) => (
-            <div
-              key={player.id}
-              className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-indigo-50/50 transition"
-            >
-              {/* Rank + Crown */}
-              <div className="col-span-1 flex items-center">
-                {player.rank === 1 ? (
-                  <FaCrown className="text-yellow-400 text-xl" />
-                ) : player.rank === 2 ? (
-                  <FaCrown className="text-gray-400 text-xl" />
-                ) : player.rank === 3 ? (
-                  <FaCrown className="text-amber-700 text-xl" />
-                ) : (
-                  <span className="font-medium">{player.rank}</span>
-                )}
+          {loading
+            ? // Skeleton loader
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="grid sm:grid-cols-12 gap-4 px-6 py-4 animate-pulse"
+              >
+                <div className="col-span-1 w-6 h-6 bg-gray-200 rounded"></div>
+                <div className="col-span-6 flex items-center">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
+                  <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                </div>
+                <div className="col-span-3 flex items-center">
+                  <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                </div>
+                <div className="col-span-2 flex items-center">
+                  <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                </div>
               </div>
+            ))
+            : leaders.map((player) => (
+              <div
+                key={player.id}
+                className="grid sm:grid-cols-12 gap-4 px-6 py-4 hover:bg-indigo-50/50 transition"
+              >
+                {/* Rank + Crown */}
+                <div className="col-span-1 flex items-center">
+                  {player.rank === 1 ? (
+                    <FaCrown className="text-yellow-400 text-xl" />
+                  ) : player.rank === 2 ? (
+                    <FaCrown className="text-gray-400 text-xl" />
+                  ) : player.rank === 3 ? (
+                    <FaCrown className="text-amber-700 text-xl" />
+                  ) : (
+                    <span className="font-medium">{player.rank}</span>
+                  )}
+                </div>
 
-              {/* Player avatar + name */}
-              <div className="col-span-6 flex items-center">
-                <div className="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
-                  <span className="font-bold text-indigo-700">
-                    {player.username.charAt(0).toUpperCase()}
+                {/* Player avatar + name */}
+                <div className="col-span-6 flex items-center">
+                  <div className="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                    <span className="font-bold text-indigo-700">
+                      {player.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="font-medium">{player.username}</span>
+                </div>
+
+                {/* Balance */}
+                <div className="col-span-3 flex items-center">
+                  <FaCoins className="text-yellow-400 mr-2" />
+                  <span className="font-medium">
+                    ₹{player.amount.toLocaleString()}
                   </span>
                 </div>
-                <span className="font-medium">{player.username}</span>
-              </div>
 
-              {/* Balance */}
-              <div className="col-span-3 flex items-center">
-                <FaCoins className="text-yellow-400 mr-2" />
-                <span className="font-medium">₹{player.amount.toLocaleString()}</span>
+                {/* Streak */}
+                <div className="col-span-2 flex items-center">
+                  <FaFire
+                    className={`mr-2 ${(player.streak ?? 0) > 7
+                      ? "text-orange-500"
+                      : "text-gray-400"
+                      }`}
+                  />
+                  <span className="font-medium">{player.streak} days</span>
+                </div>
               </div>
-
-              {/* Streak */}
-              <div className="col-span-2 flex items-center">
-                <FaFire
-                  className={`mr-2 ${(player.streak ?? 0) > 7 ? "text-orange-500" : "text-gray-400"}`}
-                />
-                <span className="font-medium">{player.streak} days</span>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </section>
