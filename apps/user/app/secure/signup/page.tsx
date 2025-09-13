@@ -3,6 +3,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import prisma from "@repo/db"
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function SignupPage() {
@@ -97,8 +98,8 @@ export default function SignupPage() {
 
       setOtpSent(true);
     } catch (err) {
-      console.error("Send OTP error:", err);
-      setError("Failed to send OTP");
+      console.error("sendOtp error:", err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSendingOtp(false);
     }
@@ -420,7 +421,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
-                  placeholder="Enter your password"
+                  placeholder="Enter your password len > 8"
                 />
                 <button
                   type="button"

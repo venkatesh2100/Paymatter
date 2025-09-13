@@ -1,13 +1,13 @@
-import Calendar from "../../../components/dashboard/calender";
 import LeaderboardPage from "../../../components/dashboard/leaderboard";
 
-
-export default function dashboard() {
+export default function Dashboard() {
   return (
-    <div>
-      <LeaderboardPage />
-      <Calendar />
+    <div className="flex p-4">
+      <div className="flex-grow mr-4">
+        <LeaderboardPage />
+      </div>
+      <div className="w-64 flex-shrink-0">
+      </div>
     </div>
-  )
+  );
 }
-

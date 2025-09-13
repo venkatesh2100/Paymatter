@@ -24,7 +24,7 @@ export default function LeaderboardPage() {
     ? Number(session.user.id)
     : undefined;
 
-  console.log(currentUserId,session)
+  // console.log(currentUserId,session)
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
@@ -137,7 +137,7 @@ export default function LeaderboardPage() {
                 <div className="col-span-3 flex items-center">
                   <FaCoins className="text-yellow-400 mr-2" />
                   <span className="font-medium">
-                    ₹{player.amount.toLocaleString()}
+                    ₹{(player.amount)/100}
                   </span>
                 </div>
 

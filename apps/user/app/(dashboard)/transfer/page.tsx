@@ -3,6 +3,7 @@ import { authOptions } from "../../lib/auth";
 import { format } from "date-fns";
 import { AddMoney } from "../../../components/addMoneycard";
 import { PrismaClient } from "@prisma/client";
+import { redirect } from "next/navigation";
 const prisma = new PrismaClient();
 
 interface CustomUser {
@@ -19,46 +20,50 @@ interface Transaction {
   provider: string;
 }
 interface FrormatedTransactions {
-    id: number;
-    time: Date;
-    amount: number;
-    status: string;
-    provider: string;
-    currency: string;
+  id: number;
+  time: Date;
+  amount: number;
+  status: string;
+  provider: string;
+  currency: string;
 }
 async function getBalance() {
-   const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
   const user = session?.user as CustomUser | undefined;
+  if (!user?.id) {
+    redirect("/home",);
+  }
+  console.log("User ID:", user?.id);
   const balance = await prisma.balance.findFirst({
     where: {
       userId: Number(user?.id),
-    }
+    },
   });
   return {
     amount: balance?.amount || 0,
-    locked: balance?.locked || 0
-  }
+    locked: balance?.locked || 0,
+  };
 }
 
 async function getOnRampTransactions() {
   const session = await getServerSession(authOptions);
-   const user = session?.user as CustomUser | undefined;
+  const user = session?.user as CustomUser | undefined;
   const txns = await prisma.onRamptransactions.findMany({
     where: {
-      userId: Number(user?.id)
+      userId: Number(user?.id),
     },
     orderBy: {
-      startTime: "desc"
-    }
+      startTime: "desc",
+    },
   });
-  return txns.map((t : Transaction) => ({
+  return txns.map((t: Transaction) => ({
     id: t.id,
     time: t.startTime,
     amount: t.amount,
     status: t.status,
     provider: t.provider,
-    currency: "RUP"
-  }))
+    currency: "RUP",
+  }));
 }
 
 export default async function TransferDashboard() {
@@ -81,7 +86,7 @@ export default async function TransferDashboard() {
           <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg shadow p-4">
             <p className="text-sm text-gray-600">Total Balance</p>
             <h2 className="text-2xl font-bold">
-              ₹{((balance.amount + balance.locked)/100).toLocaleString()}
+              ₹{((balance.amount + balance.locked) / 100).toLocaleString()}
             </h2>
           </div>
         </div>
@@ -110,16 +115,23 @@ export default async function TransferDashboard() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Available</span>
-                <span className="font-medium">₹{((balance.amount)/100).toLocaleString()}</span>
+                <span className="font-medium">
+                  ₹{(balance.amount / 100).toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Locked</span>
-                <span className="font-medium">₹{((balance.locked)/100).toLocaleString()}</span>
+                <span className="font-medium">
+                  ₹{(balance.locked / 100).toLocaleString()}
+                </span>
               </div>
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>₹{((balance.amount + balance.locked)/100).toLocaleString()}</span>
+                  <span>
+                    ₹
+                    {((balance.amount + balance.locked) / 100).toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>
@@ -134,8 +146,11 @@ export default async function TransferDashboard() {
               </p>
             </div>
             <div className="space-y-4">
-              {transactions.slice(0, 5).map((txn:FrormatedTransactions) => (
-                <div key={txn.id} className="border-b border-gray-100 pb-3 last:border-0">
+              {transactions.slice(0, 5).map((txn: FrormatedTransactions) => (
+                <div
+                  key={txn.id}
+                  className="border-b border-gray-100 pb-3 last:border-0"
+                >
                   <div className="flex justify-between">
                     <div>
                       <p className="font-medium">{txn.provider}</p>
@@ -145,14 +160,17 @@ export default async function TransferDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        {txn.currency} {((txn.amount)/100).toLocaleString()}
+                        {txn.currency} {(txn.amount / 100).toLocaleString()}
                       </p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${txn.status === "Success"
-                        ? "bg-green-100 text-green-800"
-                        : txn.status === "Processing"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                        }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          txn.status === "Success"
+                            ? "bg-green-100 text-green-800"
+                            : txn.status === "Processing"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
                         {txn.status}
                       </span>
                     </div>
@@ -203,18 +221,21 @@ export default async function TransferDashboard() {
                       {format(new Date(txn.time), "MMM d, yyyy h:mm a")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {txn.currency} {((txn.amount)/100).toLocaleString()}
+                      {txn.currency} {(txn.amount / 100).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {txn.provider}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${txn.status === "Success"
-                        ? "bg-green-100 text-green-800"
-                        : txn.status === "Processing"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                        }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          txn.status === "Success"
+                            ? "bg-green-100 text-green-800"
+                            : txn.status === "Processing"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
                         {txn.status}
                       </span>
                     </td>

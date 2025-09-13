@@ -29,12 +29,13 @@ export default function LoginPage() {
         login,
         password,
         redirect: false,
+        callbackUrl: '/home'
       });
 
       if (result?.error) {
         setError(result.error || "Invalid credentials");
       } else {
-        router.push("/dashboard");
+        router.push(result?.url || "/home");
       }
     } catch (error) {
       console.error("SignIn Error:", error);

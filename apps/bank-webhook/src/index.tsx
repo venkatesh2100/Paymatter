@@ -16,12 +16,8 @@ app.post("/hdfcWebhook", async (req, res) => {
     userId: req.body.userId,
     amount: req.body.amount,
   };
-  // console.log("Webhook received:", {
-  //   headers: req.headers,
-  //   body: req.body,
-  //   timestamp: new Date().toISOString(),
-  // });
-  console.log(paymentInformation);
+
+  // console.log(paymentInformation);
 
 
 

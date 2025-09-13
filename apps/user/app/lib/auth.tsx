@@ -6,7 +6,15 @@ import bcrypt from "bcrypt";
 import { AuthOptions, User } from "next-auth";
 import { DefaultSession } from "next-auth";
 
+// Extend User type to include custom properties
 declare module "next-auth" {
+  interface User {
+    id: string;
+    username?: string;
+    phonenumber?: string;
+    email?: string;
+  }
+
   interface Session {
     user: {
       id?: string;
@@ -27,18 +35,17 @@ declare module "next-auth/jwt" {
   }
 }
 
+// Auth options
 export const authOptions: AuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "secret",
+
+  // 🔹 Providers
   providers: [
-    // 🔹 Credentials Login
+    // Credentials Login
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
-        login: {
-          label: "username or email",
-          type: "text",
-          placeholder: "Enter your phone number or email",
-          required: true,
-        },
+        login: { label: "Username or Email", type: "text", placeholder: "Enter your phone number or email", required: true },
         password: { label: "Password", type: "password", required: true },
       },
       async authorize(credentials) {
@@ -48,15 +55,13 @@ export const authOptions: AuthOptions = {
 
         try {
           const user = await prisma.user.findFirst({
-            where: {
-              OR: [{ username: login }, { email: login }],
-            },
+            where: { OR: [{ username: login }, { email: login }] },
           });
 
           if (!user) return null;
 
-          const passwordMatch = await bcrypt.compare(password, user.password);
-          if (!passwordMatch) return null;
+          const isValid = await bcrypt.compare(password, user.password);
+          if (!isValid) return null;
 
           return {
             id: user.id.toString(),
@@ -64,88 +69,67 @@ export const authOptions: AuthOptions = {
             phonenumber: user.phonenumber || "",
             email: user.email || "",
           } as User;
-        } catch (error) {
-          console.error("🔥 Error during authorization:", error);
+        } catch (err) {
+          console.error("Authorization error:", err);
           return null;
         }
       },
     }),
 
-    // 🔹 Google Login
+    // Google Login
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 
-  secret: process.env.JWT_SECRET || "secret",
-
+  // 🔹 Custom pages
   pages: {
-    error: "/secure/error",
     signIn: "/secure/signin",
+    error: "/secure/error",
   },
 
+  // 🔹 Callbacks
   callbacks: {
     async signIn({ account, profile }) {
       if (account?.provider === "google") {
-        const email = profile?.email;
-        if (!email) return false;
+        if (!profile?.email) return false;
 
-        let existingUser = await prisma.user.findUnique({ where: { email } });
-
-        if (!existingUser) {
-          // ✅ Auto-create user in DB on first Google login
-          existingUser = await prisma.user.create({
-            data: {
-              email,
-              username: profile?.name ?? email.split("@")[0],
-              phonenumber: "", // optional, can be updated later
-              password: "", // not used for Google accounts
-            },
-          });
-        }
+        const userExists = await prisma.user.findUnique({ where: { email: profile.email } });
+        return !!userExists;
       }
       return true;
     },
 
     async jwt({ token, user, account, profile }) {
-      // 🔹 Handle Google login mapping
-      if (account?.provider === "google" && profile?.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: profile.email },
-        });
+      // Handle both credentials and Google login
+      if (user) {
+        // For credentials login, user data is already available from authorize()
+        if (account?.provider === "credentials") {
+          token.id = user.id;
+          token.username = user.username;
+          token.phonenumber = user.phonenumber;
+          token.email = user.email;
+        }
 
-        if (dbUser) {
-          token.id = dbUser.id.toString(); // ✅ Always DB ID
-          token.username = dbUser.username;
-          token.phonenumber = dbUser.phonenumber;
-          token.email = dbUser.email;
+        // For Google login, fetch user from database
+        if (account?.provider === "google" && profile?.email) {
+          const dbUser = await prisma.user.findUnique({ where: { email: profile.email } });
+          if (dbUser) {
+            token.id = dbUser.id.toString();
+            token.username = dbUser.username;
+            token.phonenumber = dbUser.phonenumber;
+            token.email = dbUser.email || "";
+          }
         }
       }
-
-      // 🔹 Handle credentials login mapping
-      if (user) {
-        const customUser = user as User & {
-          id?: string | number;
-          username?: string;
-          phonenumber?: string;
-          email?: string;
-        };
-
-        token.account = account?.provider || "";
-        token.id = customUser.id?.toString() ?? token.id;
-        token.username = customUser.username ?? token.username;
-        token.phonenumber = customUser.phonenumber ?? token.phonenumber;
-        token.email = customUser.email ?? token.email;
-      }
-
       return token;
     },
 
     async session({ session, token }) {
       session.user = {
         ...session.user,
-        id: token.id, // ✅ Always DB id now
+        id: token.id,
         username: token.username,
         phonenumber: token.phonenumber,
         email: token.email,
@@ -153,8 +137,9 @@ export const authOptions: AuthOptions = {
       return session;
     },
 
-    async redirect() {
-      return "/dashboard";
-    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    }
   },
 };
