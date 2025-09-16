@@ -20,6 +20,11 @@ model User {
   password            String
   phonenumber         String               @unique
   balance             Balance[]
+  age                 Int?
+  location            String?
+  gender              Gender?
+  image               String?
+  onboarded Boolean   @default(false)
   onRamptransactions  onRamptransactions[]
   recivcetransactions P2PTransaction[]     @relation("ReceivedTransactions")
   sendtransactions    P2PTransaction[]     @relation("SentTransactions")
@@ -27,6 +32,7 @@ model User {
   streakCount    Int?      @default(0) // current streak
   lastStreakDate DateTime? // last active day
   longestStreak  Int?      @default(0) // optional, to track best streak
+  
 }
 
 model Merchant {
@@ -76,4 +82,9 @@ enum onRampstatus {
   Processing
   Failed
   Success
+}
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }

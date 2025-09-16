@@ -1,52 +1,66 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-const prisma = new PrismaClient()
+
+const prisma = new PrismaClient();
 
 async function main() {
+  // Example user: Venky
   const venky = await prisma.user.upsert({
-    where: { phonenumber: '99' },
+    where: { phonenumber: "111" },
     update: {},
     create: {
-      phonenumber: '99',
-      password: await bcrypt.hash('venky', 10),
-      username: 'venky',
+      phonenumber: "111",
+      password: await bcrypt.hash("venky@9*3", 10),
+      username: "venky",
       email: "dreamxcodey@gmail.com",
-      streakCount: 9,
-      longestStreak: 11,
+      age: 23,
+      gender: "MALE",
+      location: "Yanam",
+      onboarded: true,
+      image: "/profiles/m/m6.webp", // default avatar
+      streakCount: 2,
+      longestStreak: 3,
       lastStreakDate: new Date(),
       balance: {
         create: {
-          amount: 20000,
-          locked: 0
-        }
+          amount: 5000,
+          locked: 200,
+        },
       },
       onRamptransactions: {
         create: {
           startTime: new Date(),
-          status: "Success",
-          amount: 20000,
+          status: "Processing",
+          amount: 1000,
           token: "token__1",
-          provider: "SBI Bank",
+          provider: "฿ Bank",
         },
       },
     },
-  })
+  });
+
+  // Example user: Zoro
   const zoro = await prisma.user.upsert({
-    where: { phonenumber: '2222222222' },
+    where: { phonenumber: "222" },
     update: {},
     create: {
-      phonenumber: '2222222222',
-      password: await bcrypt.hash('bob', 10),
-      username: 'bob',
+      phonenumber: "222",
+      password: await bcrypt.hash("zoro@9*3", 10),
+      username: "zoro",
       email: "zoroboro.ynm@gmail.com",
+      age: 21,
+      gender: "MALE",
+      location: "Japan",
+      onboarded: true,
+      image: "/profiles/m/m11.webp", // default avatar
       streakCount: 4,
       longestStreak: 5,
       lastStreakDate: new Date(),
       balance: {
         create: {
           amount: 10020,
-          locked: 0
-        }
+          locked: 0,
+        },
       },
       onRamptransactions: {
         create: {
@@ -54,19 +68,20 @@ async function main() {
           status: "Success",
           amount: 2000,
           token: "token__2",
-          provider: "HDFC Bank",
+          provider: "฿ Bank",
         },
       },
     },
-  })
-  // console.log({ venky, bob })
+  });
+
 }
+
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

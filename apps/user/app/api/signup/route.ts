@@ -1,17 +1,17 @@
-// app/api/signup/route.ts
+'use server'// app/api/signup/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@repo/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   const { username, phonenumber, password, email } = await req.json();
-  if (!username || !phonenumber || !password ||!email) {
+  if (!username || !phonenumber || !password || !email) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
   const existingUser = await prisma.user.findFirst({
     where: {
-      OR: [{ username }, { phonenumber },{email}],
+      OR: [{ username }, { phonenumber }, { email }],
     },
   });
 

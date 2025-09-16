@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaCrown, FaCoins, FaFire } from "react-icons/fa";
 import { useSession } from "next-auth/react";
@@ -24,17 +24,16 @@ export default function LeaderboardPage() {
     ? Number(session.user.id)
     : undefined;
 
-  // console.log(currentUserId,session)
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
         const res = await fetch("/api/lboard");
         const data = await res.json();
-
         const formatted: Leader[] = (data.leaderboard || []).map(
           (player: Leader, index: number) => ({
             ...player,
             rank: index + 1,
+
             streak: Math.floor(Math.random() * 10) + 1,
           })
         );
@@ -51,6 +50,7 @@ export default function LeaderboardPage() {
     }
     fetchLeaderboard();
   }, [currentUserId]);
+
 
   return (
     <section className="max-w-4xl mx-auto mt-10 mb-16 px-4">
@@ -123,21 +123,32 @@ export default function LeaderboardPage() {
                   )}
                 </div>
 
-                {/* Player avatar + name */}
-                <div className="col-span-6 flex items-center">
-                  <div className="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
-                    <span className="font-bold text-indigo-700">
-                      {player.username.charAt(0).toUpperCase()}
-                    </span>
+                {
+                  <div key={player.id} className="col-span-6 flex items-center">
+                    <div className="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                      {player.image ? (
+                        <Image
+                          src={player.image}
+                          alt={player.username}
+                          height={60}
+                          width={60}
+                          className="rounded-full"
+                        />
+                      ) : (
+                        <span className="font-bold text-indigo-700">
+                          {player.username.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-medium">{player.username}</span>
                   </div>
-                  <span className="font-medium">{player.username}</span>
-                </div>
+                }
 
                 {/* Balance */}
                 <div className="col-span-3 flex items-center">
                   <FaCoins className="text-yellow-400 mr-2" />
                   <span className="font-medium">
-                    ₹{(player.amount)/100}
+                    ฿{(player.amount) / 100}
                   </span>
                 </div>
 

@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { AddMoney } from "../../../components/addMoneycard";
 import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
+import TransactionHistory from "./Transcationhistory";
 const prisma = new PrismaClient();
 
 interface CustomUser {
@@ -163,13 +164,12 @@ export default async function TransferDashboard() {
                         {txn.currency} {(txn.amount / 100).toLocaleString()}
                       </p>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          txn.status === "Success"
-                            ? "bg-green-100 text-green-800"
-                            : txn.status === "Processing"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                        }`}
+                        className={`text-xs px-2 py-1 rounded-full ${txn.status === "Success"
+                          ? "bg-green-100 text-green-800"
+                          : txn.status === "Processing"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                          }`}
                       >
                         {txn.status}
                       </span>
@@ -188,64 +188,7 @@ export default async function TransferDashboard() {
       </div>
 
       {/* Full Transaction History (Desktop only) */}
-      <div className="mt-8 hidden lg:block">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold">Transaction History</h2>
-            <p className="text-gray-600 text-sm">
-              Complete record of all your transactions
-            </p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Provider
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {transactions.map((txn) => (
-                  <tr key={txn.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {format(new Date(txn.time), "MMM d, yyyy h:mm a")}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {txn.currency} {(txn.amount / 100).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {txn.provider}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          txn.status === "Success"
-                            ? "bg-green-100 text-green-800"
-                            : txn.status === "Processing"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {txn.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <TransactionHistory />
     </div>
   );
 }

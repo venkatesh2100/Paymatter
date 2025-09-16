@@ -9,10 +9,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Navbar />
       </div>
 
-      <div className="flex">
-        <div className="px-10">
-          {children}
-        </div>
+      <div className="px-20">
+        {children}
       </div>
     </div>
   );

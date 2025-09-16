@@ -2,7 +2,7 @@
 import prisma from "@repo/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { AuthOptions, User } from "next-auth";
 import { DefaultSession } from "next-auth";
 

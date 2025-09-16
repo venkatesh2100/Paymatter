@@ -3,7 +3,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import prisma from "@repo/db"
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function SignupPage() {

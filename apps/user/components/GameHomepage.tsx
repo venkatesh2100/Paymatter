@@ -36,7 +36,7 @@ export default function GamifiedHomepage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-800">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      <Navbar/>
+        <Navbar />
 
       </header>
 
@@ -76,7 +76,7 @@ export default function GamifiedHomepage() {
                       <p className="text-sm opacity-90">Available Balance</p>
                       <p className="text-2xl font-bold flex items-center">
                         <FaCoins className="mr-2 text-yellow-300" />
-                        ₹12,560.75
+                        ฿12,560.75
                       </p>
                     </div>
                     <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
@@ -107,7 +107,7 @@ export default function GamifiedHomepage() {
                   <div className="mb-6">
                     <p className="text-sm text-gray-500 mb-2">Amount</p>
                     <div className="flex items-center border border-gray-200 rounded-xl px-4 py-3 bg-gray-50">
-                      <span className="text-gray-500 mr-2 text-lg">₹</span>
+                      <span className="text-gray-500 mr-2 text-lg">฿</span>
                       <input
                         type="text"
                         placeholder="0.00"
@@ -119,8 +119,8 @@ export default function GamifiedHomepage() {
                       </button>
                     </div>
                     <div className="flex justify-between mt-2">
-                      <span className="text-xs text-gray-500">Min: ₹10</span>
-                      <span className="text-xs text-gray-500">Fee: ₹0.00</span>
+                      <span className="text-xs text-gray-500">Min: ฿10</span>
+                      <span className="text-xs text-gray-500">Fee: ฿0.00</span>
                     </div>
                   </div>
 
@@ -148,7 +148,7 @@ export default function GamifiedHomepage() {
                   </div>
                   <p className="text-xs text-center text-gray-600 mb-1">Payment sent</p>
                   <p className="font-medium text-center text-gray-900">Sarah Johnson</p>
-                  <p className="text-lg font-bold text-center mt-2 text-green-600">₹150.00</p>
+                  <p className="text-lg font-bold text-center mt-2 text-green-600">฿150.00</p>
                 </div>
               </div>
 
@@ -161,7 +161,7 @@ export default function GamifiedHomepage() {
                   </div>
                   <p className="text-xs text-center text-gray-600 mb-1">Received from</p>
                   <p className="font-medium text-center text-gray-900">Alex Morgan</p>
-                  <p className="text-lg font-bold text-center mt-2 text-purple-600">₹85.50</p>
+                  <p className="text-lg font-bold text-center mt-2 text-purple-600">฿85.50</p>
                 </div>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function GamifiedHomepage() {
                 <div className="text-lg font-semibold">Next Reward</div>
               </div>
               <div className="flex items-end">
-                <div className="text-3xl font-bold mr-2">₹1000</div>
+                <div className="text-3xl font-bold mr-2">฿1000</div>
                 <div className="text-sm">at Level 15</div>
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function GamifiedHomepage() {
                 <div className="text-gray-500 text-sm">XP Earned</div>
               </div>
               <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-4 rounded-xl text-center text-white">
-                <div className="text-3xl font-bold mb-1">₹2500</div>
+                <div className="text-3xl font-bold mb-1">฿2500</div>
                 <div className="text-indigo-100 text-sm">Bonus Cash</div>
               </div>
             </div>
