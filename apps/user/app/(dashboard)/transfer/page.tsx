@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { AddMoney } from "../../../components/addMoneycard";
 import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
-import TransactionHistory from "./Transcationhistory";
+import TransactionHistory from "../transactions/page";
 const prisma = new PrismaClient();
 
 interface CustomUser {

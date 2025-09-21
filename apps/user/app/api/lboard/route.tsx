@@ -21,6 +21,7 @@ export async function GET() {
             username: true,
             email: true,
             image: true,
+            streakCount: true
           },
         },
       },
@@ -36,6 +37,7 @@ export async function GET() {
       email: entry.user.email,
       image: entry.user.image,
       amount: entry.amount,
+      streakCount: entry.user.streakCount
     }));
 
     await redis.set(LEADERBOARD_CACHE_KEY, JSON.stringify(formatted), "EX", 30); // cache for 30s

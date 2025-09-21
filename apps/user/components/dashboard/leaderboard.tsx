@@ -10,7 +10,8 @@ type Leader = {
   email: string;
   amount: number;
   rank?: number;
-  streak?: number;
+  image?: string;
+  streakCount?: number;
 };
 
 export default function LeaderboardPage() {
@@ -34,7 +35,6 @@ export default function LeaderboardPage() {
             ...player,
             rank: index + 1,
 
-            streak: Math.floor(Math.random() * 10) + 1,
           })
         );
         setLeaders(formatted);
@@ -52,6 +52,7 @@ export default function LeaderboardPage() {
   }, [currentUserId]);
 
 
+  // console.log(leaders)
   return (
     <section className="max-w-4xl mx-auto mt-10 mb-16 px-4">
       {/* Header */}
@@ -155,12 +156,12 @@ export default function LeaderboardPage() {
                 {/* Streak */}
                 <div className="col-span-2 flex items-center">
                   <FaFire
-                    className={`mr-2 ${(player.streak ?? 0) > 7
+                    className={`mr-2 ${(player.streakCount ?? 0) > 7
                       ? "text-orange-500"
                       : "text-gray-400"
                       }`}
                   />
-                  <span className="font-medium">{player.streak} days</span>
+                  <span className="font-medium">{(player.streakCount ?? 0) + 1} days</span>
                 </div>
               </div>
             ))}

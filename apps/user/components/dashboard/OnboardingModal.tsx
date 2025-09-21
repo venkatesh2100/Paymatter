@@ -56,7 +56,7 @@ export default function OnboardingModal({ userId, onClose }: Props) {
         <div className="space-y-4">
           <p className="text-gray-600 text-center">What's your gender?</p>
           <div className="grid grid-cols-2 gap-3">
-            {["Male", "Female", "Other", "Prefer not to say"].map((g) => (
+            {["MALE", "FEMALE", "OTHER"].map((g) => (
               <button
                 key={g}
                 onClick={() => {
@@ -64,8 +64,8 @@ export default function OnboardingModal({ userId, onClose }: Props) {
                   setError(null);
                 }}
                 className={`p-4 rounded-xl border-2 transition-all duration-200 ${gender === g
-                    ? "border-blue-500 bg-blue-50 text-blue-700 font-medium"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
+                  ? "border-blue-500 bg-blue-50 text-blue-700 font-medium"
+                  : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
                   }`}
               >
                 {g}

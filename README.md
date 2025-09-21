@@ -3,7 +3,7 @@
 
 A web application for seamless transactions.  
 
-## 🚀 Getting Started  
+## Getting Started  
 
 1. **Clone the repo**  
    ```sh
@@ -21,14 +21,10 @@ A web application for seamless transactions.
    turbo run dev
    ```
 
-## ⚡ Features  
+##  Features  
 - Secure and fast transactions  
 - User authentication  
 - Transaction history  
 - Turbo Repo
-## 🛠 Tech Stack  
-- **Frontend:** React, Tailwind CSS  
-- **Backend:** Node.js, Express, Psql   
-- **Auth:** JWT , NextAuth 
 ---
 
