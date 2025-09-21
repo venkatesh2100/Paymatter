@@ -1,8 +1,8 @@
-//FIX: onoboard Route with Proper Profile selection and other fixes
+// FIX: onoboard Route with Proper Profile selection and other fixes
 // 'use server'
 // import { NextResponse } from "next/server";
 // import prisma from "@repo/db";
-//
+
 // export async function POST(
 //   req: Request,
 //   { params }: { params: { id: string } }
@@ -10,7 +10,7 @@
 //   try {
 //     const body = await req.json();
 //     const { age, gender, onboarded, location } = body;
-//
+
 //     // Generate image based on gender (basic example)
 //     let image: string | null = null;
 //     if (gender === "MALE") {
@@ -20,20 +20,20 @@
 //       const random = Math.floor(Math.random() * 5) + 1;
 //       image = `/profiles/f/${random}.webp`;
 //     }
-//
+
 //     // First, check if user exists
 //     const existingUser = await prisma.user.findUnique({
 //       where: { id: Number(params.id) },
 //       include: { balance: true },
 //     });
-//
+
 //     if (!existingUser) {
 //       return NextResponse.json(
 //         { success: false, error: "User not found" },
 //         { status: 404 }
 //       );
 //     }
-//
+
 //     // Update user + ensure balance exists
 //     const result = await prisma.$transaction(async (tx) => {
 //       const user = await tx.user.update({
@@ -46,17 +46,17 @@
 //           ...(image ? { image } : {}), // only set if not null
 //         },
 //       });
-//
+
 //       // Ensure balance exists and increment
 //       await tx.balance.upsert({
 //         where: { userId: user.id },
 //         update: { amount: { increment: 1000 } },
 //         create: { userId: user.id, amount: 1000 },
 //       });
-//
+
 //       return user;
 //     });
-//
+
 //     return NextResponse.json({ success: true, result });
 //   } catch (error) {
 //     console.error("Onboarding error:", error);
@@ -66,8 +66,8 @@
 //     );
 //   }
 // }
-//
-//
+
+
 // function getRandomProfile(gender: string): string {
 //   const profiles: Record<string, string[]> = {
 //     MALE: [
@@ -103,7 +103,7 @@
 //       "/profiles/o/o5.jpg",
 //     ],
 //   };
-//
+
 //   const set = profiles[gender.toUpperCase()] ?? profiles["OTHER"];
 //   return set[Math.floor(Math.random() * set.length)];
 // }

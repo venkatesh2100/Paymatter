@@ -1,12 +1,16 @@
-// apps/user/app/api/user/[id]/public-key/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@repo/db";
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const userId = params.id;
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const userId = Number(id);
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) },
+      where: { id: userId },
       select: { publicKey: true },
     });
 
