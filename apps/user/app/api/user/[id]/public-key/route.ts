@@ -1,7 +1,7 @@
 // apps/user/app/api/user/[id]/public-key/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@repo/db";
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   const userId = params.id;
 
   try {
