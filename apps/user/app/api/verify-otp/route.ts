@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import redis from "../../lib/redis";
-// Same otpStore (use Redis/DB for production)
+
+export const runtime = "nodejs"; // ensure Node runtime
 
 export async function POST(req: Request) {
   try {
@@ -8,8 +9,8 @@ export async function POST(req: Request) {
     if (!email || !otp) {
       return NextResponse.json({ error: "Email and OTP required" }, { status: 400 });
     }
-    const storedOtp = await redis.get(`otp:${email}`);
 
+    const storedOtp = await redis.get(`otp:${email}`);
     if (!storedOtp) {
       return NextResponse.json({ error: "No OTP found or expired" }, { status: 400 });
     }
@@ -19,7 +20,6 @@ export async function POST(req: Request) {
     }
 
     await redis.del(`otp:${email}`);
-
 
     return NextResponse.json({ success: true, message: "OTP verified" });
   } catch (error) {
