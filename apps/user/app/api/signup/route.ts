@@ -2,6 +2,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@repo/db";
 import bcrypt from "bcryptjs";
+function generatePublicId() {
+  return crypto.randomUUID();
+}
 
 export async function POST(req: Request) {
   const { username, phonenumber, password, email } = await req.json();
@@ -30,6 +33,7 @@ export async function POST(req: Request) {
         username,
         phonenumber,
         email,
+        publicKey: generatePublicId(),
         password: hashedPassword,
       },
     });

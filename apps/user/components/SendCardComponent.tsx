@@ -31,7 +31,7 @@ export default function SendCard() {
   const handleButton = async () => {
     setStatus("processing");
     try {
-      const res = await P2Ptransactions(Number(phone_number), Number(Amount));
+      const res = await P2Ptransactions(phone_number, Number(Amount));
       if (res?.msg.includes("Updated")) {
         setStatus("success");
       } else {
@@ -44,7 +44,7 @@ export default function SendCard() {
 
   return (
     <div className="">
-      <div className="h-[90vh] flex justify-center items-center ">
+      <div className=" h-[90vh] flex justify-center items-center ">
         <Center>
           <Card title="Send Money">
             <div>

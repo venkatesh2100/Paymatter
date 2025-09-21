@@ -14,8 +14,8 @@ import successAnimation from "../public/animations/success.json";
 import { useRef } from "react";
 
 const SUPPORTED_BANKS = [
-  { name: "HDFC Bank", redirectUrl: "https://netbanking.hdfcbank.com" },
-  { name: "Axis Bank", redirectUrl: "https://www.axisbank.com/" },
+  { name: "฿", redirectUrl: "https://netbanking.hdfcbank.com" },
+  { name: "$", redirectUrl: "https://www.axisbank.com/" },
 ];
 
 export const AddMoney = () => {

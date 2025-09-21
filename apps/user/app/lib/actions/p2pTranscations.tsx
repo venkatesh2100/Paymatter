@@ -3,12 +3,12 @@
 import { getServerSession } from "next-auth";
 import prisma from "@repo/db";
 import { authOptions } from "../auth";
-export async function P2Ptransactions(phone_number: number, amount: number) {
+export async function P2Ptransactions(publicKey: string, amount: number) {
   const session = await getServerSession(authOptions);
   interface CustomUser {
     id: string;
     username?: string;
-    phonenumber?: string;
+    publicKey?: string;
   }
 
   const user = session?.user as CustomUser | undefined;
@@ -22,7 +22,7 @@ export async function P2Ptransactions(phone_number: number, amount: number) {
 
   const toUser = await prisma.user.findFirst({
     where: {
-      phonenumber: phone_number.toString(),
+      publicKey: publicKey,
     },
   });
 
@@ -49,7 +49,7 @@ export async function P2Ptransactions(phone_number: number, amount: number) {
       },
       data: {
         amount: {
-          decrement: amount,
+          decrement: amount * 100,
         },
       },
     });
@@ -60,7 +60,7 @@ export async function P2Ptransactions(phone_number: number, amount: number) {
       },
       data: {
         amount: {
-          increment: amount,
+          increment: amount *100,
         },
       },
     });
@@ -69,7 +69,7 @@ export async function P2Ptransactions(phone_number: number, amount: number) {
       data: {
         senderID: Number(from),
         reciverID: toUser.id,
-        amount: amount,
+        amount: amount ,
       },
     });
 

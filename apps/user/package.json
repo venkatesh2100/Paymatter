@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@repo/db": "*",
-    "@repo/store": "*",
     "@repo/ui": "*",
     "@tailwindcss/postcss": "^4.0.9",
     "bcrypt": "^5.1.1",
