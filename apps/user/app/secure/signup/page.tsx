@@ -1,7 +1,7 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -22,16 +22,25 @@ export default function SignupPage() {
     null
   );
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [otpVerified, setOtpVerified] = useState(false);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState(false);
+  const [otpSuccess, setOtpSuccess] = useState(false); // New state for success visual feedback
+  const [resendTimer, setResendTimer] = useState(0);
+  const [showOtpInput, setShowOtpInput] = useState(true);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Reset OTP state when email changes
   useEffect(() => {
     setOtpSent(false);
     setOtpVerified(false);
-    setOtp("");
+    setOtp(["", "", "", "", "", ""]);
+    setResendTimer(0);
+    setShowOtpInput(true);
+    setOtpError(false);
+    setOtpSuccess(false);
   }, [formData.email]);
 
   // Username availability check
@@ -56,6 +65,17 @@ export default function SignupPage() {
 
     return () => clearTimeout(timeout);
   }, [formData.username]);
+
+  // Resend OTP timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,6 +116,8 @@ export default function SignupPage() {
       }
 
       setOtpSent(true);
+      setShowOtpInput(true);
+      setResendTimer(40); // 40 seconds countdown
     } catch (err) {
       console.error("sendOtp error:", err);
       setError("Something went wrong. Please try again.");
@@ -104,33 +126,83 @@ export default function SignupPage() {
     }
   };
 
-  const verifyOtp = async () => {
-    if (!otp) {
-      setError("Please enter OTP");
+  const handleOtpChange = (index: number, value: string) => {
+    // Only allow digits
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    setOtpError(false);
+    setOtpSuccess(false);
+
+    // Auto-focus to next input
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-submit if all fields are filled
+    if (newOtp.every(digit => digit !== "") && index === 5) {
+      // Small delay to ensure the last digit is properly set
+      setTimeout(() => {
+        verifyOtp(newOtp.join(''));
+      }, 100);
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Handle backspace to move to previous input
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const verifyOtp = async (otpValue?: string) => {
+    const otpToVerify = otpValue || otp.join('');
+    if (otpToVerify.length !== 6) {
+      setOtpError(true);
       return;
     }
 
     setIsVerifyingOtp(true);
     setError("");
+    setOtpError(false);
+    setOtpSuccess(false);
 
     try {
       const res = await fetch("/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.email, otp }),
+        body: JSON.stringify({ email: formData.email, otp: otpToVerify }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        setOtpError(true);
         setError(data.error || "OTP verification failed");
+        // Clear OTP inputs on error
+        setOtp(["", "", "", "", "", ""]);
+        otpInputRefs.current[0]?.focus();
         return;
       }
 
+      // Success feedback
+      setOtpSuccess(true);
       setOtpVerified(true);
+
+      // Hide OTP inputs after a short delay to show success state
+      setTimeout(() => {
+        setShowOtpInput(false);
+      }, 1500);
+
     } catch (err) {
       console.error("Verify OTP error:", err);
       setError("OTP verification failed");
+      setOtpError(true);
+      // Clear OTP inputs on error
+      setOtp(["", "", "", "", "", ""]);
+      otpInputRefs.current[0]?.focus();
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -224,6 +296,21 @@ export default function SignupPage() {
     otpVerified &&
     usernameAvailable === true;
 
+  // Get OTP input styling based on state
+  const getOtpInputClassName = () => {
+    const baseClasses = "w-12 h-12 text-center text-xl border rounded-lg focus:outline-none transition-all duration-300";
+
+    if (otpSuccess) {
+      return `${baseClasses} border-green-500 ring-2 ring-green-300 bg-green-50 text-green-600`;
+    } else if (otpError) {
+      return `${baseClasses} border-red-500 ring-2 ring-red-300 bg-red-50 text-red-600`;
+    } else if (isVerifyingOtp) {
+      return `${baseClasses} border-blue-500 ring-2 ring-blue-300 bg-blue-50`;
+    } else {
+      return `${baseClasses} border-gray-300 focus:ring-2 focus:ring-blue-500`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -300,6 +387,132 @@ export default function SignupPage() {
               )}
             </div>
 
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    placeholder="Enter your email"
+                  />
+                  <button
+                    type="button"
+                    onClick={sendOtp}
+                    disabled={isSendingOtp || !formData.email || resendTimer > 0}
+                    className={`px-4 py-3 rounded-lg font-medium text-sm min-w-[100px] transition-all ${isSendingOtp || !formData.email || resendTimer > 0
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-sm hover:shadow-md"
+                      }`}
+                  >
+                    {isSendingOtp ? (
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    ) : resendTimer > 0 ? (
+                      `${resendTimer}s`
+                    ) : otpSent ? (
+                      "Resend OTP"
+                    ) : (
+                      "Send OTP"
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {otpSent && showOtpInput && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Enter verification code
+                    </label>
+                    <div className="flex justify-between space-x-2">
+                      {otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => { otpInputRefs.current[index] = el }}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleOtpChange(index, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                          className={getOtpInputClassName()}
+                          disabled={isVerifyingOtp || otpVerified}
+                        />
+                      ))}
+                    </div>
+
+                    {isVerifyingOtp && (
+                      <div className="mt-3 flex justify-center items-center">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500 mr-2" />
+                        <span className="text-sm text-blue-600">Verifying...</span>
+                      </div>
+                    )}
+
+                    {otpSuccess && (
+                      <div className="mt-3 flex justify-center items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-green-500 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm text-green-600">OTP verified successfully!</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={sendOtp}
+                      disabled={resendTimer > 0}
+                      className={`text-sm ${resendTimer > 0
+                        ? "text-gray-400"
+                        : "text-blue-600 hover:text-blue-800"
+                        }`}
+                    >
+                      {resendTimer > 0
+                        ? `Resend OTP in ${resendTimer}s`
+                        : "Resend OTP"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {otpVerified && !showOtpInput && (
+                <p className="text-green-600 text-sm text-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 inline mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Email verified successfully
+                </p>
+              )}
+            </div>
+
             <div>
               <label
                 htmlFor="phonenumber"
@@ -323,88 +536,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Email
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
-                    placeholder="Enter your email"
-                  />
-                  <button
-                    type="button"
-                    onClick={sendOtp}
-                    disabled={isSendingOtp || !formData.email}
-                    className={`px-4 py-3 rounded-lg font-medium ${isSendingOtp || !formData.email
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                  >
-                    {isSendingOtp ? (
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                    ) : otpSent ? (
-                      "Resend OTP"
-                    ) : (
-                      "Send OTP"
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {otpSent && (
-                <div className="space-y-2">
-                  <label
-                    htmlFor="otp"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Enter OTP
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      id="otp"
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
-                      placeholder="Enter OTP"
-                    />
-                    <button
-                      type="button"
-                      onClick={verifyOtp}
-                      disabled={isVerifyingOtp || otpVerified || !otp}
-                      className={`px-4 py-3 rounded-lg font-medium min-w-[100px] ${isVerifyingOtp || otpVerified || !otp
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-green-500 text-white hover:bg-green-600"
-                        }`}
-                    >
-                      {isVerifyingOtp ? (
-                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                      ) : otpVerified ? (
-                        "Verified"
-                      ) : (
-                        "Verify"
-                      )}
-                    </button>
-                  </div>
-                  {otpVerified && (
-                    <p className="text-green-600 text-sm mt-1">
-                      Email verified
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
             <div>
               <label
                 htmlFor="password"
@@ -420,7 +551,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
-                  placeholder="Enter your password len > 8"
+                  placeholder="Enter your password (min 8 characters)"
                 />
                 <button
                   type="button"
@@ -497,7 +628,6 @@ export default function SignupPage() {
               </Link>
             </p>
           </div>
-
         </div>
       </div>
     </div>
