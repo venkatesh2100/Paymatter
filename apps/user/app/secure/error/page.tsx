@@ -1,9 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 
-export default function AuthErrorPage() {
+function ErrorMessage() {
   const router = useRouter();
   const params = useSearchParams();
   const error = params.get("error");
@@ -23,10 +24,10 @@ export default function AuthErrorPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
       {/* Icon */}
-      <AlertTriangle className="w-20 h-20  drop-shadow-md" />
+      <AlertTriangle className="w-20 h-20 drop-shadow-md" />
 
       {/* Title */}
-      <h1 className="mt-6 text-4xl font-extrabold  drop-shadow-sm">
+      <h1 className="mt-6 text-4xl font-extrabold drop-shadow-sm">
         Login Error
       </h1>
 
@@ -37,7 +38,7 @@ export default function AuthErrorPage() {
       <div className="mt-8 flex space-x-4">
         <button
           onClick={() => router.back()}
-          className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium  shadow-md  transition"
+          className="flex items-center space-x-2 px-6 py-3 rounded-lg font-medium shadow-md transition"
         >
           <ArrowLeft size={20} />
           <span>Go Back</span>
@@ -45,11 +46,19 @@ export default function AuthErrorPage() {
 
         <button
           onClick={() => router.push("/secure/login")}
-          className="px-6 py-3 rounded-lg font-medium    hover:from-red-700 hover:to-orange-700 shadow-md transition"
+          className="px-6 py-3 rounded-lg font-medium hover:from-red-700 hover:to-orange-700 shadow-md transition"
         >
           Try Again
         </button>
       </div>
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ErrorMessage />
+    </Suspense>
   );
 }

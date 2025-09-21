@@ -28,7 +28,7 @@ export default function OnboardingModal({ userId, onClose }: Props) {
             <span className="text-3xl">🎮</span>
           </div>
           <p className="text-gray-600 text-lg">
-            Let's get you set up with your account in just a few steps.
+            Lets get you set up with your account in just a few steps.
           </p>
         </div>
       ),
@@ -54,7 +54,7 @@ export default function OnboardingModal({ userId, onClose }: Props) {
       title: "Your Gender",
       content: (
         <div className="space-y-4">
-          <p className="text-gray-600 text-center">What's your gender?</p>
+          <p className="text-gray-600 text-center">Whats your gender?</p>
           <div className="grid grid-cols-2 gap-3">
             {["MALE", "FEMALE", "OTHER"].map((g) => (
               <button
@@ -88,7 +88,7 @@ export default function OnboardingModal({ userId, onClose }: Props) {
               <p className="text-2xl font-bold text-blue-800 tracking-wider">WELL-PAY</p>
             </div>
             <p className="text-sm text-gray-500 mt-3">
-              You'll receive 1000 bonus points after completing onboarding
+              Youll receive 1000 bonus points after completing onboarding
             </p>
           </div>
         </div>
