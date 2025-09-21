@@ -29,6 +29,9 @@ model User {
   recivcetransactions P2PTransaction[]     @relation("ReceivedTransactions")
   sendtransactions    P2PTransaction[]     @relation("SentTransactions")
 
+
+  publicKey           String               @unique 
+
   streakCount    Int?      @default(0) // current streak
   lastStreakDate DateTime? // last active day
   longestStreak  Int?      @default(0) // optional, to track best streak
