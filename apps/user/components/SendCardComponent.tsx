@@ -44,26 +44,24 @@ export default function SendCard() {
 
   return (
     <div className="">
-      <div className=" h-[90vh] flex justify-center items-center ">
-        <Center>
-          <Card title="Send Money">
-            <div>
-              <TextInput
-                placeholder="Account Number"
-                label="Account Number"
-                onChange={(value) => Setphone_number(value)}
-              />
-              <TextInput
-                placeholder="Amount"
-                label="Amount "
-                onChange={(value) => SetAmount(value)}
-              />
-              <div className="flex justify-center">
-                <Button onClick={handleButton}>Send</Button>
-              </div>
+      <div className="h-[95vh]  w-[30vw] flex justify-center items-center ">
+        <Card title="Send Money">
+          <div >
+            <TextInput
+              placeholder="Account Number"
+              label="Account Number"
+              onChange={(value) => Setphone_number(value)}
+            />
+            <TextInput
+              placeholder="Amount"
+              label="Amount "
+              onChange={(value) => SetAmount(value)}
+            />
+            <div className="flex pt-4   justify-center">
+              <Button onClick={handleButton}>Send</Button>
             </div>
-          </Card>
-        </Center>
+          </div>
+        </Card>
       </div>
 
       <AnimatePresence>

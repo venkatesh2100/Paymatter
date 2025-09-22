@@ -20,7 +20,7 @@ export default function Dashboard() {
       try {
         const res = await fetch(`/api/user/${userId}/public-key`);
         if (!res.ok) throw new Error("Failed to fetch public key");
-        const data = await res.json();userId
+        const data = await res.json();
         setPublicKey(data.publicKey);
       } catch (err) {
         console.error(err);
@@ -38,12 +38,12 @@ export default function Dashboard() {
 
   return (
     <div className="p-4">
-<div className="flex items-center">
+      <div className="flex items-center">
 
-           {publicKey && <PublicKeyComponent publicKey={publicKey} />}
-</div>
+        {publicKey && <PublicKeyComponent publicKey={publicKey} />}
+      </div>
       {/* Dashboard layout */}
-      <div className="flex mr-4 ">
+      <div className="flex ">
 
         <LeaderboardPage />
         <SendCard />
