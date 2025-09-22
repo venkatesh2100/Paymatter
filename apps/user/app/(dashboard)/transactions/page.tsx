@@ -20,7 +20,7 @@ export default function TransactionHistory() {
         if (!data.error) setTransactions(data);
       });
   }, []);
-  console.log(transactions);
+  // console.log(transactions);
 
   return (
     <div className="mt-8 hidden lg:block">

@@ -31,7 +31,7 @@ export default function SignupPage() {
   const [resendTimer, setResendTimer] = useState(0);
   const [showOtpInput, setShowOtpInput] = useState(true);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
+  const [userExists, setUserExists] = useState(false);
   // Reset OTP state when email changes
   useEffect(() => {
     setOtpSent(false);
@@ -99,6 +99,7 @@ export default function SignupPage() {
     }
 
     setIsSendingOtp(true);
+    setUserExists(false); // Reset user exists state
     setError("");
 
     try {
@@ -111,7 +112,13 @@ export default function SignupPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to send OTP");
+        if (res.status === 409) {
+          // User already exists
+          setUserExists(true);
+          setError(data.error);
+        } else {
+          setError(data.error || 'Failed to send OTP');
+        }
         return;
       }
 
@@ -408,8 +415,8 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={sendOtp}
-                    disabled={isSendingOtp || !formData.email || resendTimer > 0}
-                    className={`px-4 py-3 rounded-lg font-medium text-sm min-w-[100px] transition-all ${isSendingOtp || !formData.email || resendTimer > 0
+                    disabled={isSendingOtp || !formData.email || resendTimer > 0 || userExists}
+                    className={`px-4 py-3 rounded-lg font-medium text-sm min-w-[100px] transition-all ${isSendingOtp || !formData.email || resendTimer > 0 || userExists
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-sm hover:shadow-md"
                       }`}
@@ -425,9 +432,39 @@ export default function SignupPage() {
                     )}
                   </button>
                 </div>
+
+                {/* Show user exists message instead of OTP input */}
+                {userExists && (
+                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-yellow-600 mr-2"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-yellow-700 text-sm">
+                        This email is already registered.{" "}
+                        <Link
+                          href="/secure/login"
+                          className="text-yellow-800 font-medium underline hover:no-underline"
+                        >
+                          Click here to log in
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {otpSent && showOtpInput && (
+              {/* Only show OTP input if user doesn't exist and OTP was sent successfully */}
+              {otpSent && showOtpInput && !userExists && (
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -494,7 +531,7 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {otpVerified && !showOtpInput && (
+              {otpVerified && !showOtpInput && !userExists && (
                 <p className="text-green-600 text-sm text-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -512,7 +549,6 @@ export default function SignupPage() {
                 </p>
               )}
             </div>
-
             <div>
               <label
                 htmlFor="phonenumber"
