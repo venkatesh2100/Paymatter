@@ -1,12 +1,10 @@
 import express from "express";
 import prisma from "@repo/db";
-const app = express();
 
+const app = express();
 app.use(express.json());
 
 app.post("/hdfcWebhook", async (req, res) => {
-  //TODO: Add zod validation here?
-  //TODO: HDFC bank should ideally send us a secret so we know this is sent by them
   const paymentInformation: {
     token: string;
     userId: string;
@@ -17,55 +15,29 @@ app.post("/hdfcWebhook", async (req, res) => {
     amount: req.body.amount,
   };
 
-  // console.log(paymentInformation);
-
-
-
   try {
     const t = await prisma.onRamptransactions.findFirst({
-      where: {
-        token: paymentInformation.token
-      }
-    })
-    if (!t) {
-      throw new Error("TOken is diff");
-    }
+      where: { token: paymentInformation.token },
+    });
+    if (!t) throw new Error("Token mismatch");
 
     await prisma.$transaction([
       prisma.balance.updateMany({
-        where: {
-          userId: Number(paymentInformation.userId),
-        },
-        data: {
-          amount: {
-            // You can also get this from your prisma
-            increment: Number(paymentInformation.amount),
-          },
-        },
+        where: { userId: Number(paymentInformation.userId) },
+        data: { amount: { increment: Number(paymentInformation.amount) } },
       }),
       prisma.onRamptransactions.updateMany({
-        where: {
-          token: paymentInformation.token,
-        }
-        ,
-        data: {
-          status: "Success",
-        },
+        where: { token: paymentInformation.token },
+        data: { status: "Success" },
       }),
     ]);
-    // console.log("success")
-    res.json({
-      message: "Captured",
-    });
+
+    res.json({ message: "Captured" });
   } catch (e) {
-    console.error("Webhook proc eessing error:", JSON.stringify(e, null, 2));
-    res.status(411).json({
-      message: "Error while processing webhook",
-    });
+    // No logs here
+    res.status(411).json({ message: "Error while processing webhook" });
   }
 });
 
 const port = process.env.PORT || 3003;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.listen(port, () => { });

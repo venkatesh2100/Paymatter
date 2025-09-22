@@ -15,29 +15,31 @@ export default async function CreateOnRampTransactions(
 
   const userID = Number(session?.user.id);
   const token = randomUUID();
- await prisma.onRamptransactions.create({
-  data: {
-    provider,
-    status: "Processing",
-    amount: Number(amount) * 100,
-    userId: userID,
-    token,
-    startTime: new Date(),
-  },
-});
+  await prisma.onRamptransactions.create({
+    data: {
+      provider,
+      status: "Processing",
+      amount: Number(amount) * 100,
+      userId: userID,
+      token,
+      startTime: new Date(),
+    },
+  });
 
 
 
   try {
-    const response = await fetch("http://localhost:3003/hdfcWebhook", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token,
-        userId: userID,
-        amount: Number(amount) * 100,
-      }),
-    });
+    const response = await fetch(
+      "https://paychey-bankhook.onrender.com/hdfcWebhook"
+      , {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
+          userId: userID,
+          amount: Number(amount) * 100,
+        }),
+      });
 
     const json = await response.json();
     console.log("Webhook response:", json);

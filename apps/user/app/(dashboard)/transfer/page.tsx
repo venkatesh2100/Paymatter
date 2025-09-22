@@ -63,7 +63,7 @@ async function getOnRampTransactions() {
     amount: t.amount,
     status: t.status,
     provider: t.provider,
-    currency: "RUP",
+    currency: "BIT",
   }));
 }
 
@@ -87,7 +87,7 @@ export default async function TransferDashboard() {
           <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg shadow p-4">
             <p className="text-sm text-gray-600">Total Balance</p>
             <h2 className="text-2xl font-bold">
-              ₹{((balance.amount + balance.locked) / 100).toLocaleString()}
+              ฿ {((balance.amount + balance.locked) / 100).toLocaleString()}
             </h2>
           </div>
         </div>
@@ -117,20 +117,20 @@ export default async function TransferDashboard() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Available</span>
                 <span className="font-medium">
-                  ₹{(balance.amount / 100).toLocaleString()}
+                  ฿ {(balance.amount / 100).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Locked</span>
                 <span className="font-medium">
-                  ₹{(balance.locked / 100).toLocaleString()}
+                  ฿ {(balance.locked / 100).toLocaleString()}
                 </span>
               </div>
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
                   <span>
-                    ₹
+                    ฿
                     {((balance.amount + balance.locked) / 100).toLocaleString()}
                   </span>
                 </div>
