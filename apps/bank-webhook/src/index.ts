@@ -5,21 +5,22 @@ const app = express();
 app.use(express.json());
 
 app.post("/", async (req, res) => {
-  const paymentInformation: {
-    token: string;
-    userId: string;
-    amount: string;
-  } = {
+  const paymentInformation = {
     token: req.body.token,
     userId: req.body.userId,
     amount: req.body.amount,
   };
 
   try {
+    if (!paymentInformation.token || !paymentInformation.userId || !paymentInformation.amount) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const t = await prisma.onRamptransactions.findFirst({
       where: { token: paymentInformation.token },
     });
-    if (!t) throw new Error("Token mismatch");
+
+    if (!t) return res.status(404).json({ message: "Token not found" });
 
     await prisma.$transaction([
       prisma.balance.updateMany({
@@ -33,9 +34,9 @@ app.post("/", async (req, res) => {
     ]);
 
     res.json({ message: "Captured" });
-  } catch (e) {
-    // No logs here
-    res.status(411).json({ message: "Error while processing webhook" });
+  } catch (e: any) {
+    // Return the error in response temporarily to debug on Render
+    res.status(500).json({ message: "Error while processing webhook", error: e.message });
   }
 });
 
