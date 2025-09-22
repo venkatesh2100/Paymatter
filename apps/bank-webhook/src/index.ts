@@ -23,11 +23,11 @@ app.post("/hdfcWebhook", async (req, res) => {
 
   try {
     const t = await prisma.onRamptransactions.findFirst({
-      where:{
-        token:paymentInformation.token
+      where: {
+        token: paymentInformation.token
       }
     })
-    if(!t){
+    if (!t) {
       throw new Error("TOken is diff");
     }
 
@@ -65,4 +65,7 @@ app.post("/hdfcWebhook", async (req, res) => {
   }
 });
 
-app.listen(3003);
+const port = process.env.PORT || 3003;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
