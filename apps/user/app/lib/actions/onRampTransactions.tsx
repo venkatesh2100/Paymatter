@@ -30,7 +30,7 @@ export default async function CreateOnRampTransactions(
 
   try {
     const response = await fetch(
-      "https://paychey-bankhook.onrender.com/hdfcWebhook"
+      "https://paychey-bankhook.onrender.com/"
       , {
         method: "POST",
         headers: { "Content-Type": "application/json" },

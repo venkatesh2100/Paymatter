@@ -4,7 +4,7 @@ import prisma from "@repo/db";
 const app = express();
 app.use(express.json());
 
-app.post("/hdfcWebhook", async (req, res) => {
+app.post("/", async (req, res) => {
   const paymentInformation: {
     token: string;
     userId: string;
